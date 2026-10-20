@@ -1,0 +1,1351 @@
+\documentclass{sfuthesis}
+%\documentclass{article}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\numberwithin{equation}{chapter}
+\usepackage{chngcntr}
+\counterwithin{table}{chapter}
+\counterwithin{figure}{chapter}
+\usepackage{bm}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{amsthm}
+\usepackage{natbib}
+\usepackage[final]{graphicx}
+\usepackage{multirow}
+\usepackage{setspace}
+\usepackage{verbatim}
+\usepackage{url}
+\usepackage{xcolor}
+\color{black}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+\newtheorem{corollary}{Corollary}
+\onehalfspacing
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\usepackage[a-1b]{pdfx}      
+\usepackage{hyperref}   
+
+\hypersetup{
+  hidelinks,
+  citecolor=black
+}
+%\usepackage[
+%  letterpaper,
+%  left=1.25in,
+%  right=1.25in,
+%  top=1in,
+%  bottom=1in
+%]{geometry}
+
+
+
+\title{Tweedie Evolutionary Credibility for Insurance Pricing with AR(1) Latent Dependence}
+\author{Nahyun Kang}
+
+\previousdegrees{%
+    B.Sc., Ewha Womans University, 2024\\
+%    Previous degree, Institution, YEAR
+    }
+%Choose only one of the following degrees, and complete the "Master of" title
+%\degree{Doctor of Philosophy}
+\degree{Master of Science}
+\department{Department of Statistics and Actuarial Science}
+\faculty{Faculty of Science}
+\copyrightyear{2026}
+\semester{Summer 2026}
+
+\committee{
+    \chair{\textbf{Brad McNeney}}{Associate Professor, Statistics and Actuarial Science}
+    \member{Himchan Jeong}{Academic Supervisor \\ Assistant Professor, Statistics and Actuarial Science}
+%   If you have two or more supervisors, list each as an "Academic Co-Supervisor" and not simply as an "Academic Supervisor".
+    \member{Rachel Altman}{Committee Member \\ Associate Professor, Statistics and Actuarial Science}
+    \member{Jean-François Bégin}{Examiner \\ Associate Professor, Statistics and Actuarial Science}
+
+}
+
+\begin{document}
+
+\frontmatter
+\maketitle{}
+\makecommittee{}
+
+%\pagenumbering{roman}
+
+\begin{abstract}
+
+Insurance claim data often exhibit a large proportion of zeros, strong right skewness, heteroscedasticity, and dependence across repeated observations on the same policyholder. To address these features, this project develops an evolutionary credibility framework for insurance pricing based on the Tweedie distribution and an AR(1) latent dependence structure. Conditional on a time-varying latent factor, the claim amount is modeled through a Tweedie generalized linear model with observable policy characteristics entering the mean function. The latent factor is specified as a multiplicative random effect whose serial dependence captures persistent unobserved heterogeneity over time.
+Within this framework, we derive a linear credibility premium for future claim cost and study its relationship with naive and static premium estimators as special cases under different dependence assumptions. A simulation study is conducted under known parameter values to illustrate the proposed pricing procedure, and out-of-sample validation is used to compare the competing premium formulas. 
+
+\end{abstract}
+
+
+
+%\textbf{Keywords: Credibility premium, Dependence modeling, AR(1), Posterior ratemaking, Tweedie distribution.
+%} 
+
+\begin{acknowledgements}
+I would like to express my deepest gratitude to my supervisor, Professor Himchan Jeong, for his constant guidance, encouragement, and support throughout this project and my graduate studies. I am also sincerely thankful to the faculty members of the Department of Statistics and Actuarial Science, whose courses and advice have shaped my understanding of statistical and actuarial methodology and made this work possible. I would like to thank my fellow students for their companionship, discussions, and moral support over the past two years. Finally, I am profoundly grateful to my family and friends for their unwavering patience, care, and belief in me during the entire course of my studies.
+\end{acknowledgements}
+
+
+\addtoToC{Table of Contents}%
+\tableofcontents%
+\clearpage
+
+\addtoToC{List of Tables}%
+\listoftables%
+\clearpage
+
+\addtoToC{List of Figures}%
+\listoffigures%
+\clearpage
+
+\mainmatter
+
+\chapter{Introduction}
+
+\section{Motivation}
+
+Insurance pricing aims to estimate a fair premium that reflects both the
+expected cost of future claims and the uncertainty around those losses.
+In modern portfolios, however, claim data rarely conform to the
+assumptions of the classical Gaussian regression model. Empirical claim amounts typically exhibit a large point mass at zero, heavy right
+tails, and heteroscedasticity, with the variance increasing sharply as
+the mean claim cost grows. At the same time, observations are often
+clustered by policyholder, region, or underwriting cell, and repeated
+annual claims for the same policyholder reveal persistent differences in
+risk that are only partially explained by observed covariates.
+
+These features motivate a modeling framework that combines three
+ingredients. First, the Tweedie family with power parameter
+\(1 < p < 2\) provides a natural probabilistic description of aggregate
+claims and pure premiums, capturing both zero outcomes and continuous
+positive losses in a single parametric form. Second, generalized linear
+models (GLMs) offer a flexible way to link the Tweedie mean to rating
+variables such as age, vehicle type, and territory, while preserving
+interpretability of the resulting coefficients. Third, random-effects
+models and credibility theory highlight the importance of accounting
+for unobserved heterogeneity across policyholders, and suggest that
+premiums should adjust gradually as individual claim histories evolve.
+
+A central challenge is that unobserved risk is not static: policyholder
+behavior, exposure, and latent characteristics tend to evolve over time,
+leading to serial dependence in repeated claims from the same contract.
+Classical credibility models typically treat the latent risk factor as
+time-invariant and pool past observations as if they were exchangeable,
+which can be inappropriate when the underlying risk exhibits temporal
+persistence. This project addresses this gap by developing an
+evolutionary credibility framework in which the Tweedie claim
+amounts are driven by a time-varying latent factor following a lognormal
+AR(1) process. Within this framework, we derive a linear credibility
+premium for the next-period claim cost, study how it relates to naive
+GLM-based and static credibility premiums, and evaluate its predictive
+performance through a simulation study under known parameter values.
+
+
+\section{Literature Review}
+
+A natural starting point for modeling insurance losses is the framework of exponential dispersion models introduced by J{\o}rgensen in 1987. Within this class, the Tweedie family plays a central role because it accommodates highly skewed and zero-inflated claim amounts through its Compound Poisson representation (\cite{jorgensen1994fitting,smyth2002fitting}). In actuarial applications, Tweedie GLMs have become a standard tool for pricing and reserving, as they allow practitioners to relate the conditional mean of annual claim costs to observable rating factors while preserving a tractable likelihood-based deviance for inference and diagnostics (\cite{klugman2019}). Building on this tradition, the present project adopts a Tweedie GLM as the marginal model for policy-level claim costs and focuses on how different credibility-type premium formulas perform when the underlying risk profile evolves over time.
+
+Classical credibility theory and bonus-malus systems aim to adjust premiums on the basis of past experience, typically relying on Poisson or normal models for claim frequency and severity (\cite{buhlmann2005course,jewell1974credible}). More recent work has extended these ideas to richer distributional settings and multi-peril portfolios: for example,  \cite{jeong2023multi} propose shared random effects for multi-peril frequency credibility, while \cite{ahn2021ordering} study the ordering of credibility factors in a general exponential family setup. In parallel, several authors have explored Tweedie-based credibility and bonus-malus schemes that treat the aggregate claim amount as a Tweedie response and derive premium adjustments from the corresponding GLM structure (\cite{ohlsson2006exact,frangos2001design,jeong2024tweedie}). These contributions show that Tweedie models can be successfully integrated into credibility frameworks, but they largely operate under independence across periods and do not explicitly incorporate latent time-series dynamics in the risk profile. The present project follows this line of work by using a Tweedie response model, while relaxing the independence assumption through an AR(1) latent factor structure.
+
+Empirical evidence suggests that insurance claims often exhibit substantial dependence across time and lines of business, motivating the use of multivariate and longitudinal models that go beyond the standard independence assumptions. Copula-based multivariate Tweedie models and related regression frameworks have been developed to capture dependence between frequency and severity as well as across coverages (\cite{peng2016multilevel,shi2016insurance,frees2016multivariate,lee2019dependent,shi2022copula}). In a broader longitudinal setting, \cite{yan2013} develop a random-effects framework for non-Gaussian time-series responses with covariates, allowing the within-subject dependence to be represented through correlated latent effects. Although their work does not focus on
+Tweedie credibility premiums or actuarial pricing, it provides methodological support for
+using correlated latent effects to model repeated non-Gaussian outcomes. In the context of loss reserving and lifetime modeling, multivariate Tweedie constructions have been employed to study the impact of dependence on capital requirements and reserve risk (\cite{furman2010multivariate,avanzi2016stochastic,alai2016multivariate}). More recently, state-space and Bayesian approaches have been applied to collective risk models, where latent factors evolve over time and drive the distribution of aggregate losses (\cite{youn2023simple,jeong2020predictive}). Their work provides a broader longitudinal modeling foundation for the present setting, although it does not focus on Tweedie credibility premiums or actuarial pricing. These dynamic and latent factor models highlight the importance of accounting for temporal persistence in risk levels, but they do not directly address the design of Tweedie credibility premiums that exploit such latent AR(1) structure in an actuarial pricing context. The present project bridges this gap by combining a Tweedie GLM for claim amounts with an AR(1) latent factor process and by evaluating how different premium computation rules perform when the latent risk component is both volatile and persistent. Contributions by Ma, Yan and Hasan develop Tweedie-based credibility premiums under a multivariate lognormal specification(\cite{ma2018tweedie}). Building on this line of work, we allow the latent risk factor to evolve over time according to an AR(1) process, yielding a dynamic refinement of their static Tweedie credibility setting.
+
+Taken together, the existing literature establishes Tweedie GLMs as a flexible and well-understood tool for modeling aggregate claim amounts (\cite{jorgensen1994fitting,smyth2002fitting,klugman2019}), extends credibility and bonus-malus ideas to Tweedie and multivariate settings (\cite{ohlsson2006exact,frangos2001design,jeong2024tweedie}), and demonstrates that temporal and cross-sectional dependence can materially affect actuarial quantities of interest (\cite{jeong2020predictive,youn2023simple,peng2016multilevel,shi2016insurance}). However, comparatively little attention has been paid to credibility-type premium formulas that explicitly incorporate a latent AR(1) structure for the risk profile while retaining a Tweedie marginal for claim costs. This project contributes to this line of research by proposing an AR(1) Tweedie credibility premium, deriving its analytical form, and conducting a simulation study that compares its predictive performance against naive and static benchmarks under various regimes of latent volatility and persistence.
+
+\section{Background Theory}
+\subsection{Tweedie Distribution}
+
+The Tweedie distribution belongs to a class of exponential dispersion (ED) models, which extends the ordinary exponential family by including a dispersion parameter that allows variability beyond that implied by the mean alone. These models are  characterized by a power-type relationship between the mean and the variance. They are useful because they generalize the exponential family while allowing the variance to depend on the mean in a structured way.
+
+\begin{equation}
+    \mathrm{Var}(Y \mid \mu) = \phi V(\mu),
+    \label{eq:edm_variance}
+\end{equation}
+where $V(\mu)$ is the variance function and $\phi > 0$ is the dispersion parameter. This generalizes the constant variance assumption of the Gaussian linear model. It includes, as special or limiting cases, several familiar distributions and can naturally accommodate nonnegative data with a mass at zero. In this paper, the Tweedie distribution plays a central role by providing a flexible probabilistic framework for modeling aggregate claims and pure premiums.
+
+Let $Y$ be a random variable with mean $\mu = \mathbb{E}(Y)$ and positive dispersion parameter $\phi$. The random variable $Y$ is said to follow a Tweedie distribution, denoted by
+\begin{equation}
+    Y \sim \mathcal{T}w(\mu,\phi,p)
+\end{equation}
+if it belongs to the class of reproductive exponential dispersion models and satisfies the variance function
+\begin{equation}
+    \mathrm{Var}(Y) = \phi \mu^p,
+    \label{eq:tweedie_variance_function}
+\end{equation}
+where $p \in \mathbb{R}$ is called the Tweedie power parameter.
+
+More generally, the Tweedie distribution can be written in exponential dispersion form as
+\begin{equation}
+    P_{\theta,\phi}(Y \in A)
+    =
+    \int_A
+    \exp\left(
+        \frac{\theta z - \kappa_p(\theta)}{\phi}
+    \right)\nu_\lambda(dz),
+    \label{eq:tweedie_edm}
+\end{equation}
+for measurable sets $A$, where $\theta$ is the canonical parameter, $\kappa_p(\theta)$ is the cumulant function, and $\nu_\lambda$ is a suitable $\sigma$-finite measure.
+
+The cumulant function depends on the value of the power parameter $p$. In particular, it can be expressed as
+\begin{equation}
+    \kappa_p(\theta)
+    =
+    \begin{cases}
+    \dfrac{\alpha - 1}{\alpha}\, \theta^{\frac{\alpha}{\alpha - 1}}, & p \neq 1,2,\\[1.2em]
+    -\log(-\theta), & p = 2,\\[0.6em]
+    e^\theta, & p = 1,
+    \end{cases}
+    \label{eq:tweedie_cumulant}
+\end{equation}
+where
+\begin{equation}
+    \alpha = \frac{p-2}{p-1},
+    \qquad \text{equivalently,} \qquad
+    p = \frac{\alpha - 2}{\alpha - 1}.
+\end{equation}
+
+\subsubsection{Interpretation of the Power Parameter $p$}
+
+The Tweedie power parameter $p$ controls the relationship between the mean and the variance. When $p$ is larger, the variance increases more rapidly as the mean becomes larger. This feature is important in insurance data, where large expected losses are often accompanied by disproportionately large variability.
+
+Several well-known distributions appear as special cases of the Tweedie family. For example:
+\begin{itemize}
+    \item $p=0$ gives the Normal distribution,
+    \item $p=1$ gives the Poisson distribution,
+    \item $1<p<2$ gives the Compound Poisson Gamma distribution,
+    \item $p=2$ gives the Gamma distribution,
+    \item $p=3$ gives the inverse Gaussian distribution.
+\end{itemize}
+
+The interval $1 < p < 2$ is of particular importance in actuarial science. In this range, the Tweedie distribution corresponds to a compound Poisson Gamma model:
+
+\begin{equation}
+    Y = \sum_{k=1}^N X_k, \quad N \sim \mathrm{Poisson}(\lambda), \quad X_k \stackrel{\mathrm{iid}}{\sim} \mathrm{Gamma}(\alpha,\beta),
+    \label{eq:compound_poisson}
+\end{equation}
+
+\noindent which means that the response can take the value zero (when $N=0$) with positive probability while also being continuous on the positive real line. This makes the Tweedie family highly suitable for modeling aggregate insurance losses and pure premiums.
+
+
+\subsection{Generalized Linear Models}
+
+Generalized linear models (GLMs) extend classical linear regression to allow response variables that are not normally distributed. This extension is particularly important in insurance applications, where the response variable is often a claim count, a claim amount, or a pure premium rather than a continuous variable with approximately symmetric errors. In such settings, the Gaussian assumption is usually too restrictive, and a more flexible model structure is required to reflect the skewness, discreteness, and heteroskedasticity commonly observed in insurance data.
+
+In the standard linear model, it is typically assumed that the response variable $Y$ satisfies
+\begin{equation}
+    Y_i = x_i^\top \beta + \varepsilon_i,
+\end{equation}
+where the errors $\varepsilon_i$ are independent and identically distributed with constant variance and normality assumptions. While this formulation is mathematically convenient, it is often inappropriate for actuarial data because claim outcomes are nonnegative, highly skewed, and frequently zero-inflated. Moreover, the variance of claim amounts usually increases with the mean, which violates the homoscedasticity assumption of classical regression. 
+
+GLMs address these limitations by separating the model into three components: a random component, a systematic component, and a link function. The random component specifies the distribution of the response variable, the systematic component defines a linear predictor, and the link function connects the mean of the response to the linear predictor. This structure allows the analyst to choose a response distribution that reflects the empirical properties of the data while preserving interpretability in the regression coefficients.
+
+Let $Y_1, \dots, Y_n$ be independent response variables. A GLM is defined by the following elements:
+\begin{enumerate}
+    \item \textbf{Random component}: Each $Y_i$ follows a distribution from the exponential family or a related dispersion family.
+    \item \textbf{Systematic component}: A linear predictor
+    \begin{equation}
+        \eta_i = x_i^\top \beta,
+    \end{equation}
+    where $x_i$ is a vector of covariates and $\beta$ is a vector of regression coefficients.
+    \item \textbf{Link function}: A monotone differentiable function $g(\mu_i)$ such that
+    \begin{equation}
+        g(\mu_i) = \eta_i,
+    \end{equation}
+    where $\mu_i = \mathbb{E}(Y_i)$.
+\end{enumerate}
+
+This formulation generalizes linear regression in a way that is flexible enough to allow binary data, count data, and positive continuous outcomes. For example, the logistic regression model is a GLM for binary responses, the Poisson regression model is a GLM for counts, and the gamma regression model is a GLM for positive skewed data.
+
+\subsection{Random Effect Models}
+
+Random effects models are used when observations are grouped or repeated within clusters and the clusters themselves contribute additional variability beyond the observed covariates. In insurance pricing, such clustering can arise from repeated yearly observations on the same policyholder, policies nested within households, or claims grouped by region, agency, or fleet. In these situations, the responses are not independent, and the correlation must be taken into account.
+
+In a fixed effects model, the coefficients are treated as unknown but deterministic quantities that apply equally to all observational units. In contrast, random effects are random variables that represent latent deviations from the population intercept. The fixed effects explain systematic variation that is directly explained through covariates, while the random effects capture unobserved heterogeneity. 
+
+A simple linear mixed model can be written as
+\begin{equation}
+    y_{ij} = x_{ij}^\top \beta + b_i + \varepsilon_{ij},
+    \label{eq:lmm}
+\end{equation}
+where $b_i$ is a random intercept for cluster $i$ and $\varepsilon_{ij}$ is an idiosyncratic error term. Typically, one assumes
+\begin{equation}
+    b_i \sim \mathcal{N}(0,\sigma_b^2),
+    \qquad
+    \varepsilon_{ij} \sim \mathcal{N}(0,\sigma^2).
+\end{equation}
+
+The random intercept $b_i$ allows each cluster to have its own intercept. If a cluster tends to produce higher outcomes than average, the random effect will be positive; if it tends to produce lower outcomes, the random effect will be negative. This structure is useful because it can represent persistent unobserved risk without requiring separate fixed parameters for every cluster.
+
+%\subsection{Credibility Theory}
+%\label{subsec:credibility}
+
+%Credibility theory provides a principled way to combine collective-level information from a large portfolio with individual-level experience from a specific policyholder. In its classical formulation, the credibility premium is a weighted average of the collective premium (based on all risks in the portfolio) and the individual premium (based on the policyholder's own history), with the credibility weight reflecting the relative amount of information contained in the individual data. This framework is particularly attractive in insurance pricing because it formalizes the intuition that policyholders with longer and more stable claim histories should receive premiums that are driven more strongly by their own experience, while newer or sparser histories should rely more heavily on the portfolio average.
+
+%In the Bühlmann-Gisler formulation, the linear credibility premium is defined as the best linear predictor of the future claim cost given the past claims, under a quadratic loss function. When the response follows a reproductive exponential dispersion model and the latent risk factor is exchangeable across time, this leads to the familiar structure \begin{equation} P_{\mathrm{BG}} = \alpha \, \overline{Y} + (1-\alpha) m, \end{equation} where $\overline{Y}$ is the individual average claim, $m$ is the collective mean, and $\alpha \in [0,1]$ is the credibility factor determined by the between- and within-risk variance components. In the classical Bühlmann--Gisler formulation, covariates are not included explicitly. In our setting, covariate effects are accounted for through the GLM mean \(\mu_t\), and we work with the standardized claim. In this project, we adopt the same linear credibility principle but embed it in a Tweedie conditional specification with a time-varying latent risk factor. This generalization replaces the single scalar weight $\alpha$ by a vector of time-dependent weights on past claims, derived from the AR(1) covariance structure of the latent process. The resulting premium reduces to the naive collective premium when there is no serial dependence ($\rho = 0$) and to the classical static credibility premium when the latent factor is perfectly persistent ($\rho = 1$), thereby linking our proposed AR(1) Tweedie credibility premium to the standard actuarial credibility framework.
+
+%\paragraph{Variance components and the credibility factor:} In the standard B\"uhlmann-Gisler setup, the credibility factor $\alpha$ can be expressed explicitly in terms of the variance components as \begin{equation}   \alpha  = \frac{n}{n + k} = \frac{n \, \sigma^2_{\theta}}{n \, \sigma^2_{\theta} + \sigma^2_{\varepsilon}},   \label{eq:bg_alpha} \end{equation} where $n$ is the number of past observations per policyholder, $\sigma^2_{\theta}$ is the between-risk variance of the latent parameter, and $\sigma^2_{\varepsilon}$ is the within-risk variance of the observations around $\theta_i$. Equation \eqref{eq:bg_alpha} makes it clear that credibility increases with the amount of individual data (larger $n$) and with the magnitude of latent heterogeneity relative to process noise (larger $\sigma^2_{\theta}$, smaller $\sigma^2_{\varepsilon}$). The AR(1) Tweedie model in this project can be interpreted as replacing $n$ by an effective sample size that depends on the persistence parameter~$\rho$: stronger temporal dependence inflates the information content of recent claims relative to distant ones, leading to larger effective credibility for short-term prediction.
+
+
+
+
+\chapter{Methodology}
+\label{sec:methodology}
+In this chapter, we formalize the proposed evolutionary credibility framework
+for insurance pricing under Tweedie-distributed claims with an autoregressive
+latent risk factor. The goal is to construct a premium for the next-period claim
+cost that combines the familiar GLM structure with
+a dynamic credibility adjustment driven by an AR(1) random effect.
+We begin by specifying the hierarchical Tweedie model and the latent process
+assumptions, then derive the linear credibility premium and discuss its
+relationship to classical naive and static premiums. Throughout, we emphasize
+both the mathematical structure and the actuarial intuition behind each
+component, since the practical value of the model ultimately depends on how
+clearly the ingredients tie back to real insurance portfolios. 
+
+\section{Model Setup and Notation}
+\label{subsec:setup}
+
+We consider a panel of insurance policies followed over several periods.
+To keep the notation transparent, we adopt the following indexing conventions.
+Policyholders are indexed by \(i = 1, \ldots, I\), and for each policyholder
+\(i\) we observe claims over periods \(t = 1, \ldots, T_i\). In a typical
+application, a period corresponds to a policy year or underwriting year. 
+
+For each policyholder-period pair \((i,t)\), we denote by
+\(\mathbf{x}_{it} \in \mathbb{R}^d\) the vector of observable rating variables,
+such as age, vehicle type, region, or coverage level. These covariates enter
+the mean function through a GLM-style linear predictor. Let
+\(\boldsymbol{\beta} \in \mathbb{R}^d\) be the vector of regression coefficients.
+We write
+\[
+\eta_{it} = \mathbf{x}_{it}^\top \boldsymbol{\beta},
+\quad
+\mu_{it} = \exp(\eta_{it}),
+\]
+so that \(\mu_{it}\) represents the GLM-implied marginal mean claim cost for
+policyholder \(i\) in period \(t\), conditional on the observed characteristics. 
+
+The realized claim amount is denoted by \(Z_{it} \ge 0\). In the Tweedie
+framework with power parameter \(p \in (1,2)\), the conditional distribution
+of \(Z_{it}\) given the latent risk factor will be specified in the next
+subsection. For clarity, we suppress the policyholder index \(i\) whenever
+there is no risk of confusion and focus on a single individual with periods
+\(t = 1, \ldots, T\). This does not change the derivation of the credibility
+premium, which is inherently individual-specific. 
+
+
+\section{Tweedie Conditional Specification and Latent Factor Assumptions}
+
+A key empirical feature of insurance claim data is that many policy-years
+produce no claims at all, while those that do often generate highly skewed,
+right-tailed positive amounts. The Tweedie family with \(p \in (1,2)\) captures
+this structure by corresponding to a Compound Poisson Gamma distribution:
+there is a positive probability mass at zero and a continuous gamma-like
+density on \((0,\infty)\). This makes the Tweedie distribution a natural choice
+for modeling aggregate claims and pure premiums. 
+
+Let us assume that the claim at time $t$ of policyholder $i$, $Z_{it}$, follows a Tweedie distribution given the time-varying random effects $\theta_{it}$ as follows:
+\begin{equation} \label{condTweedie}
+Z_{it}|\theta_{it} \sim \mathcal{T}w(\mu_{it}\theta_{it}, \phi, p) \text{ and } Z_{it} \perp Z_{it'}|\theta_{it}, \theta_{it'}.
+\end{equation}
+
+%{\color{red} (To Nahyun: Please try to understand what is Tweedie distribution by reading the following page; \url{https://en.wikipedia.org/wiki/Tweedie_distribution} and the Tweedie textbook I shared with you.)}
+
+Note that $\mathbb{E}[Z_{it}|\theta_{it}]=\mu_{it}\theta_{it}$ and $\mathbb{V}ar[Z_{it}|\theta_{it}]=(\mu_{it}\theta_{it})^{p}\phi$. Here, $\eta_{it}$ corresponds to the fixed effects that capture the heterogeneity by the policy characteristics of policyholder $i$ at time $t$.
+
+
+For well-definedness and identifiability of the credibility premium, we assume that
+\begin{equation} \label{1stmoment}
+\mathbb{E}[|\theta_{it}|^{\max(p,2)}]<\infty \text{ and } \mathbb{E}[\theta_{it}]=1 \text{ for all }  i=1,\ldots, I.
+\end{equation} 
+
+Regarding the covariance structure among $\theta_{it}$, we further assume that 
+\begin{equation} \label{2ndmoment}
+\mathbb{V}ar[\theta_{it}]=\sigma^{2} \text{ and } \text{Corr}(\theta_{it}, \theta_{it'})=\rho^{|t-t'|}.
+\end{equation} 
+
+%{\color{red} (To Nahyun: Why would we need the assumptions in (2) and (3)?)}
+
+These assumptions ensure that the Tweedie conditional model is well-defined
+and that all moments used in the credibility derivation exist. The condition
+\(\mathbb{E}[|\theta_{it}|^{\max(p,2)}] < \infty\) guarantees in particular that the marginal
+second moments \(\mathbb{E}(Z_{it}^2)\) and the cross-moments \(\mathbb{E}(Z_{it} Z_{it'})\) are
+finite when the response follows a Tweedie distribution with variance function
+\(\operatorname{Var}(Z_{it} \mid \theta_{it}) = \phi (\mu_{it} \theta_{it})^{p}\). Without this integrability
+assumption, the covariance structure of the standardized claims would not be
+well-defined, and the linear credibility premium could not be expressed in
+closed form.
+
+The normalization \(\mathbb{E}[\theta_{it}] = 1\) plays a different but equally important
+role. It identifies the GLM marginal mean \(\mu_{it} = \exp(x_{it}^\top \beta)\) as the
+portfolio-wide average risk level and forces the latent factor \(\theta_{it}\) to
+represent pure multiplicative deviations around this mean. If \(E[\theta_{it}]
+\neq 1\), the GLM intercept and the latent mean would be confounded, and the
+premium could not be decomposed into a transparent ``marginal mean + credibility
+adjustment'' structure.
+
+This specifies the variance and correlation of the latent process
+and is required to derive the AR(1) covariance matrix \(\Sigma\) that enters the
+credibility weights. The condition \(\operatorname{Var}(\theta_{it}) = \sigma^{2}\) determines how
+heterogeneous policyholders are beyond what the covariates explain, while
+\(\mathrm{Corr}(\theta_{it}, \theta_{it'}) = \rho^{|t-t'|}\) encodes the temporal persistence of
+individual risk. These moments fully determine the covariance matrix of the
+standardized claims \(\operatorname{Var}(\bm{Z}^{\ast}_{T})\) and their covariances with the future claim
+\(\mathrm{Cov}(\bm{Z}^{\ast}_{T}, Z_{T+1})\). In the absence of such a specification, the
+credibility weights could not be computed, and the evolutionary premium would
+remain an abstract definition rather than an explicit formula.
+
+
+
+\begin{remark}
+While there is no need to fully specify the parametric distribution of $\bm{\theta}=(\theta_1, \ldots, \theta_T)$ except for the the first and second moments in (\ref{1stmoment}) and (\ref{2ndmoment}), it is possible to take the following choice to specify $\mathbb{E}[(\theta_t)^{p}]$ at ease with a multivariate lognormal distribution where \begin{equation}\label{eq:multiln}
+\begin{aligned}
+& \log\theta_t  \sim \mathcal{N}\left(-\log(1+\sigma^2)/2,\, \log(1+\sigma^2) \right), \\
+& \text{Corr}(\log \theta_t, \log \theta_{t'})=\frac{\log (1+\rho^{|t-t'|}\sigma^2)}{\log(1+\sigma^2)},
+\end{aligned}
+\end{equation}
+so that $\mathbb{E}[(\theta_t)^{p}]=(1+\sigma^2)^{\frac{p(p-1)}{2}}$ and $\text{Corr}(\theta_t, \theta_{t'})=\rho^{|t-t'|}$.
+\end{remark}
+
+As it is innocuous to assume that $\theta_{it} \perp \theta_{i't'}$ for $i \ne i'$ (whether $t=t'$ or not) for the proposed individual ratemaking framework, it is okay to derive credibility premium for a single policyholder $i$. That being said, we omit subscript $i$ unless there is a room for confusion for succinct expressions.
+
+\section{Lognormal Specification for the Latent Process}
+\label{subsec:lognormal}
+
+While the first and second moments of \(\theta_t\) are sufficient for the
+derivation of the linear credibility premium, it is often convenient to adopt
+an explicit parametric specification for the latent process to facilitate
+simulation and interpretation. In this project we model \(\log \theta_t\) as
+a mean-zero stationary Gaussian process with AR(1) correlation.
+
+More precisely, let
+\[
+W_t = \log \theta_t,
+\quad
+\mathbf{W} = (W_1, \ldots, W_T)^\top.
+\]
+We assume
+\[
+\mathbf{W} \sim \mathcal{N}\big( m \mathbf{1}_T, \Sigma \big),
+\]
+where \(\mathbf{1}_T\) is the \(T\)-dimensional vector of ones,
+\(m \in \mathbb{R}\) is a scalar mean chosen so that \(\mathbb{E}[\theta_t] = 1\),
+and \(\Sigma\) is a \(T \times T\) covariance matrix with entries
+\(\Sigma_{ts} = \tau^2 \rho^{|t-s|}\) for some \(\tau^2 > 0\).
+Under this specification, each \(\theta_t = \exp(W_t)\) follows a lognormal
+distribution, and the AR(1) correlation structure in \(W_t\) translates into
+geometric decay of correlation in \(W_t\). 
+
+The centering parameter \(m\) is chosen as
+\[
+m = -\frac{\tau^2}{2},
+\]
+so that
+\[
+\mathbb{E}[\theta_t]
+= \mathbb{E}[\exp(W_t)]
+= \exp\!\left( m + \frac{\tau^2}{2} \right)
+= 1.
+\]
+This ensures that the latent factor \(\theta_t\) represents purely multiplicative
+deviations around \(\mu_t\) without introducing a systematic
+level shift that would be confounded with \(\boldsymbol{\beta}\). The variance
+and correlation of \(\theta_t\) are then given by
+\[
+\operatorname{Var}(\theta_t)
+= \exp(\tau^2) - 1,
+\quad
+\operatorname{Corr}(\theta_t, \theta_s)
+= \frac{\exp(\tau^2 \rho^{|t-s|}) - 1}{\exp(\tau^2) - 1},
+\]
+which can be calibrated to match the desired \(\sigma^2\) and \(\rho\) in
+practice. 
+
+From an actuarial perspective, \(\tau^2\) controls how widely policyholders' mean claim amounts are spread around the portfolio average risk level, while \(\rho\) describes
+how quickly individual risk levels revert to the mean for given covariates. Large \(\tau^2\) and
+large \(\rho\) correspond to portfolios with strongly stratified and persistent
+unobserved heterogeneity, such as long-standing customers whose driving habits
+and exposures change slowly over time.
+
+\section{Evolutionary Linear Credibility Premium}
+\label{subsec:credibility}
+
+We consider the evolutionary linear credibility premium
+\[
+P^B(Z_{T+1} \mid \mathcal{F}_T)
+= \widehat{\alpha}_0 + \sum_{t=1}^T \widehat{\alpha}_t Z_t,
+\]
+where \((\widehat{\alpha}_0,\ldots,\widehat{\alpha}_T)\) minimizes
+\[
+\mathbb{E}\Big[\big(Z_{T+1} - \alpha_0 - \sum_{t=1}^T \alpha_t Z_t\big)^2\Big]
+\]
+over \((\alpha_0,\ldots,\alpha_T) \in \mathbb{R}^{T+1}\).
+
+Also, we define the standardized claim 
+\[
+Z_t^* = \frac{Z_t}{\mu_t}, \qquad t=1,\dots,T,
+\]
+so that
+\[
+\mathbb{E}(Z_t^* \mid \theta_t)=\theta_t,
+\qquad
+\mathrm{Var}(Z_t^* \mid \theta_t)=\frac{\phi\,\theta_t^p}{\mu_t^{2-p}}.
+\]
+Under the moment and dependence assumptions on \(\theta_t\), Bühlmann–Gisler linear credibility yields the closed-form representation
+\[
+P^B(Z_{T+1} \mid \mathcal{F}_T)
+=
+\mu_{T+1}
++
+(\bm{Z}_T^* - \mathbf{1}_T)^\top
+\mathrm{Var}(\bm{Z}_T^*)^{-1}
+\mathrm{Cov}(\bm{Z}_T^*, Z_{T+1}),
+\]
+where \( \mathcal{F}_T = \{ Z_{t} , \eta_t \}_{t=1,...T} \), \(\bm{Z}_T^* = (Z_1^*, \ldots, Z_T^*)^\top\) and \(\mathbf{1}_T\) denotes the \(T\)-dimensional vector of ones.
+
+
+The following proposition provides the explicit form of this premium under the Tweedie–AR(1) specification.
+
+\begin{proposition} If $Z_{t}|\theta_{t}$ follows \eqref{condTweedie} and $(\theta_1, \ldots, \theta_{T+1})$ satisfy \eqref{1stmoment} and \eqref{2ndmoment}, then the linear credibility premium for period $T+1$ can be written as
+\begin{equation} \label{tweediecredS}
+\begin{aligned}
+P^B(Z_{T+1}^{(j)}|\mathcal{F}_T)&=\mu_{T+1}+(\bm{Z}_{T }^{*}-\bm{1}_J)^\top\left[ \text{diag} \left( \frac{V}{\bm{\mu}_T^{2-p}} \right) + \Sigma \right]^{-1} (\rho^T, \rho^{T-1}, \ldots, \rho)^\top \cdot \mu_{T+1} 
+\end{aligned}
+\end{equation}
+where $V=\phi\mathbb{E}[\theta_{t}^{p}]/\mathbb{V}ar[\theta_t]$, $\bm{\mu}_T=(\mu_1, \ldots, \mu_T)$, and $[\Sigma ]_{k,l}=\rho^{k-l}$ for $k,l=1 ,\ldots, T$.
+\end{proposition}
+
+\begin{proof}
+
+
+\color{black}  Let
+
+Since \(Z_t\) and \(Z_{t'}\) are conditionally independent given \((\theta_t,\theta_{t'})\) for \(t\neq t'\), we obtain
+\[
+\mathrm{Cov}(Z_t^*,Z_{t'}^*)
+=\mathrm{Cov}(\theta_t,\theta_{t'})
+=\sigma^2\rho^{|t-t'|}.
+\]
+Hence the covariance matrix of \(\bm{Z}_T^*=(Z_1^*,\dots,Z_T^*)^\top\) can be written as
+\[
+\mathrm{Var}(\bm{Z}_T^*)
+=
+\mathrm{diag}\!\left(\frac{\phi\,\mathbb{E}(\theta_1^p)}{\mu_1^{2-p}},\dots,\frac{\phi\,\mathbb{E}(\theta_T^p)}{\mu_T^{2-p}}\right)
++\sigma^2\Sigma,
+\]
+where \(\Sigma\) is the AR(1) correlation matrix with \([\Sigma]_{kl}=\rho^{|k-l|}\). Moreover,
+\[
+\mathrm{Cov}(\bm{Z}_T^*,Z_{T+1})
+=
+\big(\mathrm{Cov}(Z_1^*,Z_{T+1}),\dots,\mathrm{Cov}(Z_T^*,Z_{T+1})\big)^\top
+=\sigma^2\mu_{T+1}(\rho^T,\rho^{T-1},\dots,\rho)^\top.
+\]
+Therefore, Bühlmann-Gisler linear credibility gives
+\[
+P^B(Z_{T+1}\mid\mathcal{F}_T)
+=
+\mu_{T+1}
++
+\big(\bm{Z}_T^*-\mathbf{1}_T\big)^\top
+\mathrm{Var}(\bm{Z}_T^*)^{-1}
+\mathrm{Cov}(\bm{Z}_T^*,Z_{T+1}),
+\]
+which yields the stated result after substituting the covariance matrices above. 
+\end{proof}
+
+\begin{corollary}
+If $\rho=0$, then
+$$
+P^B(Z_{T+1}^{(j)}|\mathcal{F}_T)= \mu_{T+1}.
+$$
+\end{corollary}
+\begin{proof}
+
+
+\color{black} If \(\rho=0\), then \(\Sigma=I_T\) and
+\[
+\mathrm{Cov}(\bm{Z}_T^*,Z_{T+1})=\mathbf{0}.
+\]
+Hence the adjustment term vanishes and we obtain
+\[
+P^B(Z_{T+1}\mid\mathcal{F}_T)=\mu_{T+1}.
+\]
+This is exactly the marginal mean of \(Z_{T+1}\), which is the naive premium. 
+
+\end{proof}
+
+It implies there is no serial correlation over the claims from the same policyholder, so that $P^B(Z_{T+1}^{(j)}|\mathcal{F}_T)$ is indeed $\mu_{T+1}$, which is the same as marginal mean of $Z_{T+1}$.
+
+\begin{corollary}
+If $\rho=1$ then 
+$$
+P^B(Z_{T+1}^{(j)}|\mathcal{F}_T)=\left[\frac{V + \sum_{t=1}^T Z_t \mu_t^{1-p}}{V + \sum_{t=1}^T \mu_t^{2-p}}\right] \mu_{T+1}.
+$$
+\end{corollary}
+
+
+\begin{proof}
+If $\rho=1$, then $\Sigma=\bm{1}_J\bm{1}_J^\top$ so that, by the Sherman-Morrison formula, we have
+$$
+\begin{aligned}
+\left[\mathbb{V}ar(\bm{Z}_{T}^{*})\right]^{-1} &= \frac{1}{\sigma^2} \left[ \text{diag} \left( \frac{V}{\bm{\mu}_T^{2-p}} \right) + \bm{1}_J\bm{1}_J^\top  \right]^{-1} \\
+&= \frac{1}{\sigma^2} \left[ \text{diag} \left( \frac{\bm{\mu}_T^{2-p}}{V} \right) - \frac{ \left( {\bm{\mu}_T^{2-p}}/{V} \right) \left( {\bm{\mu}_T^{2-p}}/{V} \right)^\top }{1+\bm{1}_J^\top \text{diag} \left( {\bm{\mu}_T^{2-p}}/{V} \right) \bm{1}_J} \right] \\
+&= \frac{1}{\sigma^2} \left[ \text{diag} \left( \frac{\bm{\mu}_T^{2-p}}{V} \right) - \frac{ \left( {\bm{\mu}_T^{2-p}}/{V} \right) \left( {\bm{\mu}_T^{2-p}}/{V} \right)^\top }{1+ \sum_{t=1}^T \mu_t^{2-p}/V} \right]
+\end{aligned}
+$$
+and
+$$
+\text{Cov}\left(\bm{Z}_{T}^{*}, Z_{T+1}\right)= \sigma^2 \mu_{T+1} \bm{1}_J.
+$$
+By noting that $\left( {\bm{\mu}_T^{2-p}}/{V} \right)^\top \bm{1}_J =\sum_{t=1}^T \mu_t^{2-p}/V$, now we have
+$$
+\begin{aligned}
+\left[\mathbb{V}ar(\bm{Z}_{T}^{*})\right]^{-1}\text{Cov}\left(\bm{Z}_{T}^{*}, Z_{T+1}\right)/\mu_{T+1}&=\left[ \text{diag} \left( \frac{\bm{\mu}_T^{2-p}}{V} \right) - \frac{ \left( {\bm{\mu}_T^{2-p}}/{V} \right) \left( {\bm{\mu}_T^{2-p}}/{V} \right)^\top }{1+ \sum_{t=1}^T \mu_t^{2-p}/V} \right] \bm{1}_J \\
+&= \left( {\bm{\mu}_T^{2-p}}/{V} \right)  \times \left[1- \frac{\sum_{t=1}^T \mu_t^{2-p}/V}{1+\sum_{t=1}^T \mu_t^{2-p}/V}\right] \\ 
+&=  \left( {\bm{\mu}_T^{2-p}} \right)  \times \left[\frac{1}{V+\sum_{t=1}^T \mu_t^{2-p}}\right].
+\end{aligned}
+$$
+\end{proof}
+
+
+\noindent It is the same as Theorem 3.1 of
+\citet{ohlsson2006exact}, choosing $p_j=1$ and $p_j=2$ as in \citet{frangos2001design}.
+
+
+\section{Relationship to Naive and Static Premiums}
+\label{subsec:naive-static}
+
+The evolutionary AR(1) Tweedie credibility premium can be viewed as a dynamic
+generalization of two familiar benchmarks: the naive collective premium and
+the static B{\"u}hlmann credibility premium. This connection is important because
+it shows that the proposed method does not replace classical credibility
+concepts, but rather interpolates between them depending on the strength of
+temporal dependence in the underlying risk.
+
+\paragraph{Naive collective premium:}
+The naive premium treats each policyholder as if their entire risk profile
+were captured by the observed covariates alone, ignoring past claims. In our
+notation, the naive premium for period \(T+1\) is simply
+\[
+P^{\text{Naive}}_{T+1}
+= \mu_{T+1},
+\]
+which coincides with the GLM-implied mean under the Tweedie model. This is
+the collective premium in the sense of B{\"u}hlmann-Gisler: the portfolio is
+priced based on the population average risk level, and no credibility
+adjustment is applied.
+
+In the evolutionary framework, setting \(\rho = 0\) corresponds to a latent
+process with no temporal correlation across periods. Intuitively, the latent
+risk in period \(T+1\) is then independent of past latent risk, so past claims
+cannot improve prediction of the next-period claim beyond what the covariates
+already explain. In this case, the covariance vector collapses
+towards zero, the credibility weights vanish, and the
+evolutionary premium reduces to the naive GLM premium:
+\[
+P_{T+1} = \mu_{T+1}.
+\]
+
+
+\paragraph{Static credibility premium:}
+Classical static credibility models assume that the latent risk factor is
+constant over time for each policyholder. In our notation, this corresponds
+to \(\theta_t = \theta\) for all \(t\), so that past claims can be pooled as
+exchangeable observations on the same latent risk level. Under this assumption,
+the optimal linear predictor of the next-period claim is a weighted average of
+the collective mean claim amount and the individual mean claim amount, with the credibility weight
+determined by the between- and within-risk variance components.
+
+In the Tweedie-AR(1) setting, taking the limit \(\rho \to 1\) yields a latent
+process that is perfectly persistent. The correlation between
+\(\theta_t\) and \(\theta_s\) is one even for large time lags,
+and the covariance matrix \(\mathbf{V}\) becomes rank-one. In this
+regime, the evolutionary credibility premium approaches a static B{\"u}hlmann-type
+credibility estimator, in which all past standardized claims are pooled with
+similar weights, and the adjustment to the GLM-implied mean premium depends primarily on
+the long-run individual mean. This behavior is reflected in the second
+corollary in the main text, which shows that the evolutionary weights collapse
+to a scalar static credibility factor when \(\rho = 1\).
+
+The numerical study in Chapter~\ref{sec:sim_approach} confirms that imposing
+static credibility weights when the true latent process is only moderately
+persistent can be harmful: the static premium may perform worse than the naive
+GLM premium because it overweights distant past observations relative to recent
+ones. By contrast, the AR(1)-based evolutionary premium adapts the weights to
+the actual temporal dependence and consistently improves upon the naive
+GLM benchmark across the configurations considered.
+
+\section{Interpretation and Practical Implications}
+\label{subsec:interpretation}
+
+The methodological structure developed above has several practical
+implications for insurance pricing. First, it clarifies the roles of the GLM
+and the latent AR(1) process. The GLM component remains responsible for
+capturing systematic variation in claim costs due to observable risk factors.
+This ensures that the premium responds appropriately to changes in rating
+variables such as age, vehicle type, or territory in a transparent way.
+
+Second, the latent AR(1) process provides a flexible yet interpretable
+mechanism for modeling persistent unobserved heterogeneity. The parameters
+\(\sigma^2\) and \(\rho\) have clear actuarial meanings: \(\sigma^2\) measures
+how heterogeneous policyholders are beyond what the covariates explain, and
+\(\rho\) measures how long the current latent individual risk level persist over time. These parameters govern how strongly the evolutionary
+premium reacts to the policyholder's own claim history.
+
+Third, the derivation of the evolutionary credibility premium shows that past
+claims do not enter the premium in a naive or ad hoc way. Instead, the weights
+assigned to each past claim are determined by the covariance structure implied
+by the latent process. Recent claims receive larger weight when \(\rho\) is
+high, reflecting strong persistence, while distant claims receive smaller
+weight as their predictive relevance decays. This geometric decay in the
+weights prevents the model from overreacting to very old claims, which is a
+known weakness of static credibility models in temporally structured data.
+
+Finally, by explicitly linking the evolutionary premium to the naive and
+static benchmarks, the methodology provides a coherent framework for assessing
+when dynamic credibility is worth the added complexity. In portfolios where
+\(\rho\) is estimated to be small and \(\sigma^2\) is modest, the gains over
+the naive GLM may be limited, and a simpler pricing rule could suffice. In
+portfolios with large \(\sigma^2\) and moderate to large \(\rho\), the
+simulation study shows that the AR(1) Tweedie evolutionary premium can deliver
+material reductions in out-of-sample prediction error, justifying its use in
+practice.
+
+\pagebreak
+
+
+\chapter{Estimation Strategy}
+\label{sec:sim_approach}
+
+In this section we outline the intended estimation strategy for the structural
+parameters $(\beta, p, \phi, \sigma, \rho)$ and explain why, for the purposes
+of this project, we ultimately evaluate the proposed credibility premium under
+known parameter values. The goal is to separate the predictive contribution of
+the AR(1) credibility formula from the additional uncertainty introduced by
+parameter estimation while also documenting the limitations of a natural but
+naive plug-in approach.
+
+%\section{Stepwise Estimation Procedure}
+%\label{subsec:stepwise}
+
+A natural starting point for empirical implementation is a stepwise
+procedure: we first estimate the marginal Tweedie GLM parameters and
+then estimate the parameters governing the distribution and temporal
+dependence of the latent risk factor.
+
+\begin{enumerate}
+    \item \textbf{Stage 1: Marginal Tweedie GLM for ($\beta$, $p$, $\phi$)} - 
+    Treat each policyholder-period observation $Z_{it}$ as an independent
+    draw from a Tweedie distribution with mean
+    $\mu_{it} = \exp(x_{it}^\top \beta)$, dispersion $\phi$ and power
+    parameter $p \in (1,2)$, and estimate $(\beta, p, \phi)$ by maximizing
+    the marginal Tweedie likelihood. This step ignores the latent AR(1)
+    dependence, but likely delivers consistent estimates of the mean structure
+    under standard quasi-likelihood arguments.
+
+    \item \textbf{Stage 2: Method-of-moments or MCMC for $(\sigma, \rho)$} - 
+    Given plug-in estimates $(\hat\beta, \hat p, \hat\phi)$ from Stage 1,
+    estimate the latent variance $\sigma^2$ and AR(1) correlation parameter
+    $\rho$ by matching empirical second moments of the observed claims to
+    their theoretical counterparts implied by the hierarchical model.
+\end{enumerate}
+
+In principle, this two-stage scheme would yield a fully data-driven version of
+the proposed premium in Equation~\eqref{tweediecredS}, with all structural
+parameters estimated from the observed panel. In practice, as described below,
+the second stage suffers from severe finite-sample instability, motivating the
+oracle-parameter simulation design adopted in Chapter~\ref{sec:sim_study}.
+
+\section{Marginal Tweedie GLM for Fixed Parameters}
+\label{subsec:marginal_tweedie}
+
+The first stage fits a Tweedie GLM to the panel data while treating the within-policyholder dependence induced by the
+latent risk factor as unmodelled. Specifically, we specify
+\[
+Z_{it} \sim \mathcal{T}w\big(\mu_{it}, \phi, p\big), \qquad
+\mu_{it} = \exp(x_{it}^\top \beta),
+\]
+and maximize the log-likelihood under a working-independence Tweedie model
+\begin{equation}
+\ell(\beta, p, \phi)
+= \sum_{i=1}^{I} \sum_{t=1}^{T_i}
+   \log f_{\mathcal{T}w}\big(Z_{it}; \mu_{it}, \phi, p\big),
+\label{eq:marginal_tweedie_ll}
+\end{equation}
+where $f_{\mathcal{T}w}(Z_{it}; \mu_{it}, \phi, p)$ denotes the Tweedie density
+evaluated via the series expansion algorithm implemented in the \texttt{tweedie}
+package in R to perform a profile likelihood search for $p$ over a grid in
+$(1.1, 1.9)$, followed by maximum likelihood estimation of $\bm{\beta}$ and
+$\phi$ at the selected $\widehat{p}$.. Although this specification ignores the serial dependence and the extra-variation induced
+by the latent AR(1) process, the marginal mean function $\mu_{it}$ remains
+correctly specified, so that the resulting estimator $\hat\beta$ is consistent
+under the quasi-likelihood theory of \citet{Wedderburn1974}. The estimated
+power parameter $\hat p$ and dispersion $\hat\phi$ are then treated as fixed
+inputs for the second-stage analysis. 
+
+In the simulation study, this marginal GLM is primarily used as a sanity
+check: we calibrate $(\beta, p, \phi)$ in the data generating process so that
+the fitted GLM estimates the marginal mean structure without numerical
+difficulties. The latent-process parameters $(\sigma, \rho)$ are deliberately
+held at their true values rather than estimated in order to isolate the
+predictive effect of the AR(1) credibility adjustment. This design evaluates the predictive value of the proposed
+AR(1) credibility rule conditional on correct latent-process
+parameters.
+
+\section{Method of Moments and MCMC for estimating $\sigma$ and $\rho$}
+\label{subsec:mom_sigma_rho}
+
+Given estimates $(\hat\beta, \hat p, \hat\phi)$ from the marginal GLM, a
+natural next step is to estimate the latent variance $\sigma^2$ and AR(1)
+correlation $\rho$ by equating sample and model-implied second moments.
+
+Under the hierarchical Tweedie AR(1) model, the marginal second moment of
+$Z_{it}$ can be written as
+\[
+\mathbb{E}\big[(Z_{it})^2\big]
+= \mu_{it}^{p} \, \phi \,(1 + \sigma^2)^{\frac{p(p-1)}{2}}
+  + \mu_{it}^{2} (1 + \sigma^2),
+\]
+where $\mu_{it} = \exp(x_{it}^\top \beta)$. This suggests solving for
+$\hat\sigma$ in the nonlinear equation
+\begin{equation}
+(1+\hat{\sigma}^2)\sum_{i=1}^I \sum_{t=1}^{T_i}\mu_{it}^2
++ \hat{\phi}\,(1+\hat{\sigma}^2)^{\frac{\hat{p}(\hat{p}-1)}{2}}
+  \sum_{i=1}^I  \sum_{t=1}^{T_i} \mu^{\hat{p}}_{it}
+- \sum_{i=1}^I \sum_{t=1}^{T_i} Z_{it }^2 \simeq 0,
+\label{eq:mom_sigma}
+\end{equation}
+where $(\mu_{it}, \phi, p)$ are assumed known or replaced by the consistent
+estimates from the marginal GLM.
+
+Likewise, for $t \neq t'$ the cross-moment satisfies
+\[
+\mathbb{E}[Z_{it} Z_{it'}]
+= \mu_{it}\mu_{it'} + \mathrm{Cov}(\mu_{it}\theta_{it},
+                                   \mu_{it'}\theta_{it'})
+= \mu_{it}\mu_{it'} \big(1 + \rho^{|t-t'|} \sigma^2\big),
+\]
+so that a method-of-moments estimator $\hat\rho$ could be obtained by
+matching
+\begin{equation}
+\sum_{i=1}^I \sum_{t \ne t'} Z_{it}Z_{it'}
+\simeq
+\sum_{i=1}^I \sum_{t \ne t'} \mu_{it}\mu_{it'}
+ \big(1+\rho^{|t-t'|}\hat{\sigma}^2\big),
+\label{eq:mom_rho}
+\end{equation}
+again using $(\hat\beta, \hat p, \hat\phi)$ in place of the true parameters.
+In principle, equations \eqref{eq:mom_sigma} and \eqref{eq:mom_rho} define a
+pair of method-of-moments estimators $(\hat\sigma, \hat\rho)$ for the latent
+process parameters. However, such a procedure cannot preclude a situation where $\hat\sigma^2$ and $\hat\rho$ fell outside the admissible parameter
+space, producing $\hat\sigma^2 < 0$ or $\hat\rho \notin (0,1)$. 
+
+In that regard, one can also apply the MCMC to find the posterior mean of $\sigma$ and $\rho$, given that  $(\hat\beta, \hat p, \hat\phi)$ are used as the plug-in estimates of the true parameters.
+
+
+\section{Limitations of the Naive Plug-in Approach}
+\label{subsec:naive_limit}
+
+%Although the method-of-moments system is algebraically well defined, our numerical experiments revealed that the corresponding estimators are highly unstable in finite samples. Even in relatively large simulated panels with $I = 2{,}000$ policyholders and $T = 5$ observation periods, the solutions for $\hat\sigma^2$ and $\hat\rho$ frequently fell outside the admissible parameter space, producing $\hat\sigma^2 < 0$ or $\hat\rho \notin (0,1)$. This behavior is consistent with the well-known difficulty of estimating variance components and correlation parameters from limited second-moment information (\cite{Davis2003,Zeger1988}), especially when the latent process enters multiplicatively and the signal-to-noise ratio varies across covariate patterns.
+
+% From a methodological perspective, these failures indicate that a naive two-stage plug-in procedure is not a reliable basis for empirical deployment of the proposed premium. A more robust approach would require a full likelihood-based or Bayesian treatment of the joint parameter vector $(\beta, p, \phi, \sigma, \rho)$, possibly with constraints or priors that enforce $\sigma^2 \ge 0$ and $\rho \in (0,1)$, and with careful attention to identifiability and numerical optimization. Developing such an estimation procedure lies beyond the scope of the present project and is identified as a priority for future research in Chapter~\ref{sec:conclusion}.
+
+%For the purposes of the current study, we therefore adopt an oracle-parameter simulation design: the fixed-effect parameters $(\beta, p, \phi)$ and latent process parameters $(\sigma, \rho)$ are treated as known and set equal to their data generating values in Chapter~\ref{sec:sim_study}. This design isolates the predictive performance of the AR(1) Tweedie credibility premium from the additional layer of uncertainty due to parameter estimation, and provides a clean benchmark for assessing whether, and by how much, the proposed method improves upon the Naive and Static premium formulas.
+
+We implemented a Gaussian MCMC in R using the \texttt{nimble} package. Although the Tweedie distribution admits a likelihood, its density for \(1<p<2\) is typically evaluated through an infinite-series expansion rather than a closed-form expression. More importantly, under the proposed model the observations are coupled through the serially dependent latent process \(\theta_{it}\). A full likelihood-based analysis would therefore require integrating the joint Tweedie likelihood over the latent AR(1) process, which does not yield a tractable closed-form marginal likelihood and would require substantially more specialized numerical methods.
+
+For this reason, we used a Gaussian likelihood that matches the conditional Tweedie mean and variance. 
+We used independent priors
+
+\[
+\sigma \sim \operatorname{Unif}(0,1),
+\qquad
+\rho \sim \operatorname{Unif}(0,1).
+\]
+
+
+Table~\ref{tab:mcmc-mom-10rep} reports the Gaussian pseudo-likelihood MCMC and method-of-moments estimates from 10 simulated panels with \(I = 2000\) and \(T = 5\). The data-generating values are \(\beta_0 = 2.5\), \(\beta_1 = 3.5\), \(\beta_2 = -0.5\), \(p = 1.5\), \(\phi = 20\), \(\rho = 0.7\), and \(\sigma = 0.2\) where $x_{1it} \sim N(0,0.5^2) $, $x_{2it} \sim {Bernoulli}(0.7)$ and $\log\mu_{it} = \beta_0 + \beta_1x_{1it}+ \beta_2x_{2it}$. The MCMC runs produce 
+%regression coefficients and Tweedie dispersion and power parameters that stay in a reasonable neighborhood of their nominal values, but the
+latent-process parameters \((\rho,\sigma)\) under substantial distortion: across the 10 replications, the posterior means for \(\rho\) lie between approximately \(0.49\) and \(0.52\), and those for \(\sigma\) lie between \(0.49\) and \(0.53\), far from the intended values \(\rho = 0.7\) and \(\sigma = 0.2\).
+
+The method-of-moments (MoM) estimates for \((\rho,\sigma)\) are even more unstable. In most panels the MoM estimator for \(\rho\) hits the boundaries \(0\) or \(1\), and the corresponding estimates of \(\sigma\) often collapse to zero or remain very small, with occasional larger spikes (e.g., \(\widehat{\sigma}_{\mathrm{MoM}} = 0.2173\) in replication~7). This pattern illustrates that, even with \(I = 2000\) and \(T = 5\), the simple method of moments and Gaussian working-likelihood MCMC strategies do not provide reliable estimates of the latent variance and persistence.
+
+
+\begin{table}[ht]
+\centering
+\caption{MCMC and method-of-moments estimates for the Tweedie--AR(1) parameters over 10 simulated panels with \(I = 2000\) and \(T = 5\).}
+\begin{tabular}{cccccc}
+\hline
+Rep & \(\widehat{\beta}_0\) & \(\widehat{\beta}_1\) & \(\widehat{\beta}_2\) & \(\widehat{p}\) & \(\widehat{\phi}\)  \\
+\hline
+1  & 2.5083 & 3.4767 & -0.5270 & 1.4977 & 20.4788  \\
+2  & 2.4536 & 3.5083 & -0.4296 & 1.5657 & 16.6095  \\
+3  & 2.4683 & 3.5767 & -0.5549 & 1.4851 & 20.5024  \\
+4  & 2.4733 & 3.5218 & -0.4762 & 1.5424 & 17.9120  \\
+5  & 2.4938 & 3.4926 & -0.4439 & 1.5490 & 18.2816  \\
+6  & 2.4802 & 3.5071 & -0.4997 & 1.5407 & 17.6644  \\
+7  & 2.5171 & 3.4642 & -0.5206 & 1.4451 & 23.6280  \\
+8  & 2.4531 & 3.5284 & -0.4567 & 1.5827 & 16.6645  \\
+9  & 2.4264 & 3.5908 & -0.4407 & 1.5201 & 19.6522  \\
+10 & 2.4591 & 3.4767 & -0.4429 & 1.4869 & 21.1008  \\
+\hline
+\end{tabular}
+
+\medskip
+
+\begin{tabular}{cccccc}
+\hline
+Rep & \(\widehat{\rho}_{\mathrm{MCMC}}\) & \(\widehat{\sigma}_{\mathrm{MCMC}}\) & \(\widehat{\rho}_{\mathrm{MoM}}\) & \(\widehat{\sigma}_{\mathrm{MoM}}\) \\
+\hline
+1  & 0.5036 & 0.5131 & 0.0000  & 0.0000   \\
+2  & 0.5204 & 0.4931 & 0.0000  & 0.0000   \\
+3  & 0.4902 & 0.5327 & 0.0537  & 0.0828   \\
+4  & 0.4946 & 0.4873 & 0.0000  & 0.0000   \\
+5  & 0.5228 & 0.5060 & 1.0000  & 0.0000   \\
+6  & 0.5017 & 0.4959 & 1.0000  & 0.0000   \\
+7  & 0.4860 & 0.5186 & 0.0000  & 0.2173   \\
+8  & 0.5216 & 0.5166 & 1.0000  & 0.0000   \\
+9  & 0.5208 & 0.4957 & 1.0000  & 0.0000   \\
+10 & 0.4981 & 0.4974 & 0.0000  & 0.1455   \\
+\hline
+\end{tabular}
+\label{tab:mcmc-mom-10rep}
+\end{table}
+
+
+
+%We therefore treat \((\rho,\sigma)\) as known oracle parameters and concentrate on the predictive behavior of the naive, static, and dynamic premium formulas under correctly specified dependence.
+
+From a methodological perspective, these failures indicate that a naive two-stage plug-in procedure is not a reliable basis for empirical deployment of the proposed premium. A more robust approach would require a full likelihood-based or Bayesian treatment of the joint parameter vector $(\beta, p, \phi, \sigma, \rho)$, possibly with constraints or priors that enforce $\sigma^2 \ge 0$ and $\rho \in (0,1)$, and with careful attention to identifiability and numerical optimization. Developing such an estimation procedure lies beyond the scope of the present project and is identified as a priority for future research in Chapter~\ref{sec:conclusion}.
+
+For the purposes of the current study, we therefore adopt an oracle-parameter simulation design: the fixed-effect parameters $(\beta, p, \phi)$ and latent process parameters $(\sigma, \rho)$ are treated as known and set equal to their data generating values in Chapter~\ref{sec:sim_study}. This design isolates the predictive performance of the AR(1) Tweedie credibility premium from the additional layer of uncertainty due to parameter estimation, and provides a clean benchmark for assessing whether, and by how much, the proposed method improves upon the Naive and Static premium formulas.
+
+\pagebreak
+
+
+
+\chapter{Simulation Study}
+\label{sec:sim_study}
+
+
+It is important to clarify the scope of the present numerical investigation. The contributions of this project are primarily methodological: we derive a new credibility premium formula that accommodates Tweedie-distributed claims with temporally autocorrelated latent risk factors. The estimation of the underlying structural parameters --- particularly $\sigma$ and $\rho$ --- under realistic data conditions raises a separate and substantial set of statistical challenges. Preliminary investigations into joint estimation revealed that the maximum likelihood estimator of $\sigma$ exhibits severe boundary truncation behavior in finite samples, with a non-trivial proportion of replications producing $\hat{\sigma} = 0$. Given that the primary objective of this project is to validate the predictive value of equation \eqref{tweediecredS}, and given the well-documented difficulty of estimating variance components in random-effects models, we deliberately separate these two concerns. The present chapter therefore evaluates equation \eqref{tweediecredS} under the assumption that the structural parameters $(\bm{\beta}, p, \phi, \sigma, \rho)$ are known. This approach, often termed as sanity check, isolates the predictive contribution of the proposed formula from the confounding effects of estimation error.
+
+The purpose of this section is to assess how robust the proposed
+AR(1) Tweedie credibility premium is with respect to changes in key
+model parameters. In addition to providing basic sanity checks of the
+theoretical derivation --- verifying that the premium behaves sensibly
+under trivial scenarios such as $\rho = 0$ or homogeneous risks --- we
+conduct a systematic sensitivity analysis over a grid of
+configurations. Specifically, we vary the dispersion parameter
+$\phi$, the AR(1) correlation $\rho$, and the latent volatility
+$\sigma$ over a pre-specified grid and, for each combination, compare
+the out-of-sample RMSE and premium levels of the proposed method
+against the naive benchmark. This allows us to quantify how strongly
+the performance gains of the dynamic credibility premium depend on the
+temporal dependence and noise level.
+%, and to identify regions of the parameter space where the model is most effective or potentially fragile.
+
+\section{Data Generating Process and Parameter Settings}
+The simulation employs the Tweedie AR(1) model specified in Chapter~\ref{sec:methodology}. For each replication, we generate a panel dataset consisting of $n = 2{,}000$ policyholders observed over $T = 5$ periods, together with a sixth period $T+1$ that serves as the out-of-sample prediction target. The data generating mechanism proceeds in four steps.
+
+\paragraph{Step 1: Covariate generation.}
+For each policyholder $i = 1, \dots, n$, we generate a covariate vector $\bm{x}_i = (1, x_{i1}, x_{i2})^\top$ containing an intercept and two predictors representing typical risk factors. The continuous covariate is drawn as $x_{i1} \sim \mathcal{N}(0, 1)$ and the binary covariate as $x_{i2} \sim \text{Bernoulli}(0.5)$, independently across $i$ and between $x_{i1}$ and $x_{i2}$. These choices reflect the standard practice in actuarial simulation studies of including one continuous and one categorical risk factor; in real applications these would correspond to variables such as policyholder age and gender, vehicle type and territory, or any other relevant rating dimension.
+
+\paragraph{Step 2: Marginal mean computation.}
+The mean of the Tweedie distribution for policyholder $i$ is computed via the log link of the generalized linear model:
+\begin{equation}
+\mu_{\text{base}, i} = \exp(\bm{x}_i^\top \bm{\beta}), \qquad \bm{\beta} = (2.5, 0.5, -0.5)^\top.
+\label{eq:baseline}
+\end{equation}
+The choice of $\beta_0 = 2.5$ places the marginal mean of exposure-adjusted claim cost at a moderate level ($\exp(2.5) \approx 12.2$), with the coefficient on the continuous covariate set to $\beta_1 = 0.5$ to introduce meaningful but not extreme heterogeneity across policyholders, and the coefficient on the binary covariate set to $\beta_2 = -0.5$ to create a two-tier structure analogous to gender or territorial classification. The selection of these coefficient values is the result of preliminary scale-calibration experiments --- earlier configurations with larger $\beta_1$ produced extreme values of $\exp(\bm{x}_i^\top \bm{\beta})$ that, when combined with the multiplicative latent factor $\theta_{i,t}$, generated occasional outliers that were unrealistic in practice. The current parameterization yields a well-behaved distribution of means without compromising the qualitative features of the simulation.
+
+\paragraph{Step 3: Latent AR(1) process.}
+The heart of the data generating process is the latent risk factor $\theta_{i,t}$ that captures the unobserved, individual-specific temporal fluctuations in each policyholder's underlying risk. We model the log of this factor as a stationary AR(1) Gaussian process. Specifically, for each policyholder $i$, we draw
+\begin{equation}
+(W_{i,1}, W_{i,2}, \dots, W_{i,T+1})^\top \sim \mathcal{N}_{T+1}\!\left(-\tfrac{1}{2}\sigma^2 \bm{1}_{T+1},\ \sigma^2 \bm{R}(\rho)\right),
+\label{eq:latent}
+\end{equation}
+where $\bm{1}_{T+1}$ denotes a vector of ones and the correlation matrix $\bm{R}(\rho)$ has $(s, t)$ entry $\rho^{|s-t|}$. The latent multiplicative factor is then defined as $\theta_{i,t} = \exp(W_{i,t})$. The mean of $W_{i,t}$ is centered at $-\sigma^2/2$ so that, by the moment-generating function of the log-normal distribution, $\mathbb{E}[\theta_{i,t}] = 1$. This centering ensures that the latent factor represents pure multiplicative deviation around the GLM-implied mean without introducing a systematic level shift that would confound the interpretation of $\bm{\beta}$.
+
+The AR(1) correlation structure has a clear actuarial interpretation: the parameter $\rho \in (0, 1)$ controls the persistence of individual risk over time. A policyholder who experiences an elevated latent risk in year $t$ (e.g., due to a change in driving habits, occupation, or health) tends to experience elevated risk in year $t+1$ as well, with the strength of this persistence governed by $\rho$. The marginal variance $\sigma^2$ on the log scale governs the magnitude of unexplained heterogeneity not captured by the observed covariates $\bm{x}_i$.
+
+\paragraph{Step 4: Tweedie claim generation.}
+Given the marginal mean and the latent factor, the claim amount for policyholder $i$ in period $t$ is drawn from a Tweedie distribution:
+\begin{equation}
+Z_{i,t} \mid \theta_{i,t} \sim \mathcal{T}w\!\left(\mu_{\text{base}, i} \cdot \theta_{i,t},\ \phi=10,\ p=1.5\right),
+\label{eq:tweedie-gen}
+\end{equation}
+where $\phi$ is the dispersion parameter and $p$ is the power parameter satisfying $1 < p < 2$. The Tweedie distribution with $p \in (1, 2)$ is the compound Poisson gamma distribution, which assigns positive mass to the event $Z_{it} = 0$ (no claim) while supporting a continuous gamma-like density on $Z_{it} > 0$. This property makes the Tweedie family the standard choice for modeling aggregate insurance claims, where a substantial fraction of policy-years generates zero claims. The implementation uses the \texttt{rtweedie()} function from the R package \texttt{tweedie}. 
+
+The simulation study uses a structured hyperparameter grid to evaluate the proposed dynamic credibility premium across a range of latent variance and persistence settings. Specifically, we vary the latent volatility parameter \(\sigma\) and the AR(1) persistence parameter \(\rho\) over pre-specified values representing weak, moderate, and strong unobserved heterogeneity and temporal dependence. For each configuration, we generate repeated panel datasets from the Tweedie--AR(1) model and compare the out-of-sample performance of the proposed dynamic premium with the naive GLM-implied premium and the static credibility premium. This design makes it possible to assess both the average predictive performance of the proposed method and the conditions under which accounting for temporal dependence provides a meaningful improvement.
+
+\section{Hyperparameter Grid Design}
+\label{subsec:grid}
+
+The central research question motivating this chapter is the extent to which the proposed AR(1) credibility premium derives its predictive advantage from the temporal dependence structure of the latent process. To address this question systematically rather than relying on a single fixed parameter configuration, we evaluate equation \eqref{tweediecredS} on a two-dimensional grid spanning a range of plausible values for the two latent process parameters:
+\begin{equation}
+\sigma \in \{0.5,\ 1.0,\ 1.5,\ 2.0\}, \qquad \rho \in \{0.3,\ 0.5,\ 0.7,\ 0.9\},
+\label{eq:grid}
+\end{equation}
+yielding $16$ distinct configurations in total. The remaining parameters are held fixed across the grid at $\phi = 10$ and $p = 1.5$, values that produce realistic Tweedie distributions with moderate mass at zero (approximately $30$-$50\%$ under typical marginal means) and dispersion levels consistent with empirical insurance datasets.
+
+The grid is designed to span a range of practically relevant scenarios. The $\rho$ dimension covers everything from weak temporal persistence ($\rho = 0.3$, corresponding to a one-year-ahead correlation that decays to less than $1\%$ by year five) to strong persistence ($\rho = 0.9$, where past observations remain informative over much longer horizons). The $\sigma$ dimension ranges from modest latent variability ($\sigma = 0.5$, implying a log-normal coefficient of variation of approximately $\sqrt{e^{0.25} - 1} \approx 0.53$) to substantial latent variability ($\sigma = 2.0$, with coefficient of variation approximately $7.3$). This range was chosen to encompass both the regime in which the latent process is a small correction to the GLM marginal mean and the regime in which it dominates the variability of observed claims.
+
+For each of the 16 configurations, we conduct 100 independent replications, each consisting of a fresh data generation and prediction evaluation. The total computational budget therefore corresponds to 1600 simulated panel datasets. 
+
+\section{Computing Premium Estimators: Naive, Static, Proposed, True}
+\label{subsec:premium_methods}
+We evaluate four predictive methods, each representing a distinct philosophical approach to premium computation. Their formulations and conceptual content are summarized in Table~\ref{tab:methods}.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparator methods for premium prediction at period $T+1$.}
+\label{tab:methods}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Method & Formula & Information Used \\
+\midrule
+Naive    & $\hat{P}^{\text{Naive}}_i = \mu_{\text{base}, i}$ & Covariates only \\
+Static   & $\hat{P}^{\text{Static}}_i = \alpha_i \bar{Y}_i + (1-\alpha_i)\mu_{\text{base}, i}$ & Covariates + pooled history \\
+Proposed & $\hat{P}^{\text{Proposed}}_{i, T+1} = \mu_{\text{base}, i}\!\left(1 + {c}_i^\top {V}_i^{-1}({Z}_i^* - {1})\right)$ & Covariates + AR(1)-weighted history \\
+True (oracle) & $\hat{P}^{\text{True}}_i = \mu_{\text{base}, i} \cdot \theta_{i, T+1}$ & Future latent factor \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The \textbf{naive} method represents the simplest possible approach: the predicted premium equals the GLM-implied marginal mean. This method uses no information from the past claim history of the policyholder, treating each individual as if their entire risk profile were summarized by their observed covariates. In the context of credibility theory, this corresponds to the \emph{collective premium} defined in \citet[Chapter~1]{buhlmann2005course}. It is the relevant benchmark for assessing whether the additional complexity introduced by credibility models is empirically justified.
+
+The \textbf{static} method implements a classical Bühlmann-type credibility estimator that incorporates the historical mean $\bar{Y}_i = T^{-1}\sum_{t=1}^T Y_{i,t}$ but treats the past observations as exchangeable, ignoring their temporal ordering. The credibility weight $\alpha_i$ is computed using the standard Bühlmann formula:
+\begin{equation}
+\alpha_i = \frac{T \cdot \tau_i^2}{T \cdot \tau_i^2 + \sigma_{W,i}^2},
+\label{eq:bw}
+\end{equation}
+where $\tau_i^2 = (e^{\sigma^2} - 1)\,\mu_{\text{base}, i}^2$ is the between-individual variance implied by the latent log-normal structure, and $\sigma_{W,i}^2 = \phi\,\mu_{\text{base}, i}^p$ is the within-individual conditional Tweedie variance. The Static method serves as a critical benchmark: it represents the standard credibility approach without the AR(1) refinement, and any predictive improvement of the Proposed method over Static can be attributed specifically to the incorporation of temporal dependence.
+
+The \textbf{proposed} method is the AR(1) Tweedie evolutionary credibility premium derived from the following equation:
+\begin{equation}
+\hat{P}^{\text{Proposed}}_{i, T+1} = \mu_{\text{base}, i}\!\left(1 + \bm{c}_i^\top \bm{V}_i^{-1}(\bm{Z}_i^* - \bm{1})\right),
+\label{eq:proposed-restated}
+\end{equation}
+where $\bm{Z}_i^* = \bm{Z}_{i, 1:T} / \mu_{\text{base}, i}$ is the vector of standardized historical claims, $\bm{V}_i$ is the $T \times T$ covariance matrix of $\bm{Z}_i^*$ implied by the AR(1) latent process, and $\bm{c}_i$ is the $T$-vector of cross-covariances between $\bm{Z}_i^*$ and the future standardized claim $Z^*_{i, T+1}$. 
+
+The \textbf{true} method is the theoretical oracle that uses the actual realized value of the future latent factor $\theta_{i, T+1}$ --- information that is never available in practice but provides a meaningful lower bound on achievable RMSE. The difference between the proposed premium and the true premium quantifies
+the remaining room for improvement under the data-generating model: even with
+exact knowledge of the AR(1) dependence structure, the irreducible variance
+of the future Tweedie draw remains.
+
+
+
+\section{Out-of-Sample Validation Results}
+\label{sec:results}
+
+Table~\ref{tab:rmse-grid} reports the average out-of-sample RMSE of the four
+methods --- naive, static, proposed, and the true oracle --- across all $16$
+configurations of $(\sigma, \rho)$, with each cell averaged over $100$
+independent replications. Figures~\ref{fig:rmse-bar}-\ref{fig:rho-trend}
+provide complementary visual summaries of the same results.
+
+In the context of this project, RMSE is adopted as the primary evaluation metric because the main objective is to compare the predictive accuracy of competing premium formulas rather than to assess goodness-of-fit of alternative GLM specifications. The simulation study in Chapter 4 fixes the mean structure and Tweedie parameters and varies only the premium computation rule and the latent dependence assumptions, with performance assessed on an out-of-sample holdout period. In this predictive setting, RMSE directly quantifies the average discrepancy between predicted and realized claim costs and is therefore more interpretable from an actuarial viewpoint, where even modest reductions in portfolio-level prediction error can translate into material financial gains. 
+\begin{table}[htbp]
+\centering
+\caption{Out-of-sample RMSE across the 16 configurations of $(\sigma,\rho)$. Each entry reports the mean RMSE over 100 replications. The sample consists of $n = 2{,}000$ policyholders observed over $T = 5$ periods, with period $T+1$ used as the holdout. Fixed parameters: $\beta = (2.5, 0.5, -0.5)^\top$, $p = 1.5$, $\phi = 10$.}
+\label{tab:rmse-grid}
+\begin{tabular}{cccccc}
+\hline
+$\sigma$ & $\rho$ & Naive & Static & Proposed & True \\
+\hline
+0.5 & 0.3 & 22.52  & 22.78  & 22.51  & 21.42  \\
+0.5 & 0.5 & 22.22  & 22.41 & 22.19  & 21.21  \\
+0.5 & 0.7 & 22.34  & 22.39  & 22.26 & 21.26  \\
+0.5 & 0.9 & 22.34  & 22.17 & 22.15  & 21.27 \\
+1.0 & 0.3 & 29.51  & 31.07  & 29.43  & 24.54  \\
+1.0 & 0.5 & 29.81  & 31.04  & 29.52 & 24.46  \\
+1.0 & 0.7 & 29.22  & 29.84  & 28.60  & 24.38  \\
+1.0 & 0.9 & 29.40 & 28.17 & 27.72 & 24.30 \\
+1.5 & 0.3 & 45.76 & 49.92 & 45.67  & 30.75  \\
+1.5 & 0.5 & 49.24 & 53.79  & 48.96 & 32.24  \\
+1.5 & 0.7 & 45.75 & 48.23  & 45.00  & 30.47  \\
+1.5 & 0.9 & 44.78 & 42.01   & 42.96  & 30.17  \\
+2.0 & 0.3 & 80.19  & 92.73  & 80.16  & 39.50  \\
+2.0 & 0.5 & 81.69 & 93.75  & 81.59  & 38.07  \\
+2.0 & 0.7 & 74.24  & 79.71  & 73.87  & 39.61  \\
+2.0 & 0.9 & 79.06  & 74.27  & 78.30  & 40.68  \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[htbp]
+\centering
+\caption{Out-of-sample mean Tweedie deviance across the 16 configurations of $(\sigma,\rho)$. Each entry reports the mean deviance over 100 replications, with the standard deviation in parentheses. The simulation design matches that of Table~\ref{tab:rmse-grid}.}
+\label{tab:dev-grid}
+\begin{tabular}{cccccc}
+\hline
+$\sigma$ & $\rho$ & Naive & Static & Proposed & True \\
+\hline
+0.5 & 0.3 & 1.024 (0.024) & 1.041 (0.025) & 1.023 (0.023) & 0.944 (0.021) \\
+0.5 & 0.5 & 1.021 (0.021) & 1.033 (0.022) & 1.019 (0.021) & 0.944 (0.017) \\
+0.5 & 0.7 & 1.018 (0.021) & 1.022 (0.022) & 1.014 (0.021) & 0.940 (0.020) \\
+0.5 & 0.9 & 1.022 (0.021) & 1.011 (0.021) & 1.009 (0.021) & 0.942 (0.017) \\
+1.0 & 0.3 & 1.158 (0.036) & 1.302 (0.046) & 1.152 (0.035) & 0.861 (0.022) \\
+1.0 & 0.5 & 1.157 (0.042) & 1.261 (0.053) & 1.136 (0.040) & 0.857 (0.019) \\
+1.0 & 0.7 & 1.156 (0.041) & 1.196 (0.051) & 1.112 (0.038) & 0.858 (0.019) \\
+1.0 & 0.9 & 1.158 (0.034) & 1.077 (0.033) & 1.055 (0.025) & 0.858 (0.017) \\
+1.5 & 0.3 & 1.357 (0.071) & 1.939 (0.134) & 1.346 (0.069) & 0.733 (0.017) \\
+1.5 & 0.5 & 1.382 (0.093) & 1.837 (0.173) & 1.345 (0.077) & 0.740 (0.017) \\
+1.5 & 0.7 & 1.365 (0.076) & 1.568 (0.115) & 1.293 (0.060) & 0.737 (0.021) \\
+1.5 & 0.9 & 1.348 (0.074) & 1.169 (0.070) & 1.212 (0.044) & 0.735 (0.019) \\
+2.0 & 0.3 & 1.610 (0.179) & 3.923 (0.754) & 1.604 (0.176) & 0.596 (0.017) \\
+2.0 & 0.5 & 1.612 (0.217) & 3.292 (0.595) & 1.588 (0.194) & 0.595 (0.017) \\
+2.0 & 0.7 & 1.597 (0.144) & 2.503 (0.376) & 1.544 (0.126) & 0.595 (0.018) \\
+2.0 & 0.9 & 1.607 (0.180) & 1.463 (0.135) & 1.489 (0.114) & 0.593 (0.018) \\
+\hline
+\end{tabular}
+\end{table}
+
+As a secondary diagnostic, we also computed the mean out-of-sample Tweedie
+deviance for the Naive and Proposed premiums (Table~\ref{tab:dev-grid}).
+The Tweedie unit deviance measures the discrepancy between the observed claim and the predicted mean under the Tweedie mean--variance relationship. We average the unit deviance, scaled by the dispersion parameter, over the out-of-sample observations. Lower values indicate better predictive performance under this loss. We use this quantity as a predictive loss rather than as a formal goodness-of-fit test.The results show that the
+Proposed method attains lower average deviance than the Naive
+method in all 16 $(\sigma,\rho)$ configurations, with the difference
+DEV\_Naive $-$ DEV\_Proposed being uniformly positive. The magnitude of this
+reduction increases with $\rho$ and is largest around $(\sigma,\rho) = (1.5, 0.9)$. Although these numerical
+differences are modest on the deviance scale, they are fully consistent with the
+RMSE reductions reported in Table~\ref{tab:rmse-grid} and yield a similar ranking of the premium estimators under the two evaluation metrics considered here.
+
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{fig_rmse_bar.png}
+    \caption{Out-of-sample RMSE of the four premium estimators across the
+$16$ $(\sigma, \rho)$ configurations. The proposed method (red) is
+uniformly at or below the naive method (gray) in every cell, and the
+static method (blue) is frequently worse than naive at low to moderate
+$\rho$, indicating the cost of imposing exchangeability on a temporally
+dependent process.}
+    \label{fig:rmse-bar}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{fig_rmse_heatmap.png}
+    \caption{Absolute RMSE reduction of the proposed method over naive,
+$ \\ \text{RMSE}_{\text{Naive}} - \text{RMSE}_{\text{Proposed}}$, displayed on
+the $(\sigma, \rho)$ grid. The improvement is non-negative across
+all $16$ cells and is maximized in the upper-right region of moderate
+latent variability ($\sigma \in \{1.0, 1.5\}$) combined with strong
+temporal persistence ($\rho = 0.9$).}
+    \label{fig:rmse-heatmap}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{figure_rho_trend.png}
+    \caption{Relative RMSE reduction of the proposed method over naive,
+expressed as a percentage of the naive RMSE, plotted against $\rho$ for
+each level of $\sigma$. The improvement is strictly monotone in $\rho$ at
+every level of $\sigma$, and is largest at $\sigma = 1.0$ where the
+predictive value of the temporal structure is neither dominated by
+Tweedie noise (small $\sigma$) nor swamped by latent variability (large
+$\sigma$).}
+    \label{fig:rho-trend}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{fig_dev_heatmap.png}
+    \caption{Deviance reduction of the proposed credibility model relative to the naive benchmark across the latent variance-persistence grid. Each cell reports the average difference in out-of-sample deviance, \( \mathrm{DEV}_{\mathrm{Naive}} - \mathrm{DEV}_{\mathrm{Proposed}} \), for the corresponding \( (\sigma, \rho) \) configuration, where \( \sigma \) is the latent log-scale standard deviation and \( \rho \) is the AR(1) persistence parameter. Positive values indicate an improvement (lower deviance) of the proposed model over the naive model, with darker shades corresponding to larger deviance reductions.}
+    \label{fig:dev-heatmap}
+\end{figure}
+
+Five main findings emerge from the simulation:
+
+First, across the 16 configurations considered, the proposed dynamic Tweedie–AR(1) credibility premium yields only modest improvements over the naive GLM-based premium. The relative reductions in RMSE are typically in the range of \(0\%\)–\(1\%\), with somewhat larger gains of about \(2\%\)–\(5\%\) appearing only in scenarios with moderately large latent variance and persistence. We therefore view the proposed premium as providing a small but systematic enhancement rather than a dramatic improvement. 
+
+Second, the average improvement generally becomes larger as $\rho$ increases, particularly at moderate levels of latent volatility. Holding $\sigma$ fixed, the  RMSE
+reduction over naive is a strictly increasing function of $\rho$ at
+every level of $\sigma$ (Figure~\ref{fig:rho-trend}). This pattern
+is intrinsically interpretable: when the latent process is weakly
+persistent, past claims carry little information about the future, and
+no credibility weighting scheme can extract much signal from them.
+Conversely, when the latent process is highly persistent, recent claims
+are strongly predictive of the next-period latent factor, and the
+AR(1)-weighted formula leverages this dependence to substantial
+predictive gain.
+
+Third, the static method is frequently worse than the naive
+method. In $12$ of the $16$ configurations, the average RMSE of the
+Static method exceeds that of the naive method. This is a striking and
+practically important finding. The static method represents the
+classical Bühlmann credibility approach, which pools past observations
+without regard to their temporal ordering, and a practitioner who
+applied this method to data with an underlying AR(1) structure would
+obtain a premium that is on average less accurate than a premium based
+on covariates alone. The intuition is that, when the latent process has
+$\rho < 1$, the assumption $\rho = 1$ implicit in the static method
+overweights distant past observations relative to recent ones,
+introducing bias that can exceed the variance reduction obtained from
+pooling. The proposed method avoids this failure mode by allowing the
+weights on past observations to decay geometrically with lag, as
+implied by the AR(1) covariance structure derived in
+equation~\eqref{tweediecredS}.
+
+Fourth, a substantial residual gap separates all feasible methods
+from the true oracle. Across the grid, the true oracle achieves
+RMSE values that are consistently lower than the proposed
+method. This difference represents the inherent unpredictability of the
+period-$(T+1)$ Tweedie draw conditional on the realized future latent factor
+$\theta_{i,T+1}$. Even with perfect knowledge of the latent state, the
+conditional dispersion of the Tweedie response remains; consequently, no
+refinement of the credibility premium can eliminate this source of prediction
+error. The gap is greatest
+in large $\sigma$, where the conditional variance
+$\phi \mu_{\text{base}, i}^p \cdot \theta_{i, T+1}^{p}$ scales sharply with the
+latent factor. Closing this gap would require either stronger
+distributional assumptions or additional covariate information, and
+falls outside the scope of the present formulation.
+
+
+Fifth, the resulting deviance reductions indicate that the proposed credibility model tends to outperform the naive benchmark, although the gains are generally modest and become more pronounced only as the latent variance and persistence increase. Figure~\ref{fig:dev-heatmap} summarizes the average out-of-sample deviance reduction of the proposed credibility model relative to the naive benchmark over the latent variance–persistence grid. For each configuration \((\sigma, \rho)\), we compute the difference \(\mathrm{DEV}_{\mathrm{Naive}} - \mathrm{DEV}_{\mathrm{Proposed}}\), so that positive values correspond to lower deviance under the proposed model.
+
+
+
+\pagebreak 
+\chapter{Conclusion}
+\label{sec:conclusion}
+
+This project has developed an evolutionary credibility premium for
+insurance pricing under a Tweedie conditional response with an AR(1)
+latent dependence structure. The proposed framework extends the
+classical Bühlmann credibility approach in two directions
+simultaneously: it accommodates the zero-inflated, right-skewed claim
+distributions that are characteristic of insurance data through the
+Tweedie family with power parameter $p \in (1, 2)$, and it allows the
+unobserved individual risk factor to evolve over time as a stationary
+log-normal AR(1) process governed by the two parameters $\sigma$ and
+$\rho$. Within this framework, Proposition~1 derives a closed-form
+expression for the linear credibility premium that admits the naive
+premium (no credibility adjustment) and the Static premium (classical
+Bühlmann exchangeable pooling) as special cases at $\rho = 0$ and
+$\rho = 1$, respectively. The proposed formula therefore unifies the two extremes of the credibility spectrum within a single expression, with the limiting cases corresponding to
+different values of the persistence parameter.
+
+
+The simulation study evaluated the proposed premium against three
+competing methods across a $4 \times 4$ grid of latent process
+parameters $(\sigma, \rho) \in \{0.5, 1.0, 1.5, 2.0\} \times
+\{0.3, 0.5, 0.7, 0.9\}$, with $100$ independent replications per cell.
+Three findings stand out. First, the proposed method achieved a lower average out-of-sample RMSE than the naive method in all 16 configurations, but the absolute improvements are generally small. Second, the relative
+improvement over Naive was monotonically increasing in $\rho$ at every
+level of $\sigma$, providing direct empirical confirmation that the
+predictive gain originates from the AR(1) dependence component of the
+model. Third, and most consequentially from a practical standpoint, the
+Static method was inferior to the Naive method in $11$ of the $16$
+configurations, demonstrating that the classical Bühlmann formula can
+actively harm predictive accuracy when applied to data with an
+underlying autocorrelated latent process. This finding has direct
+implications for actuarial practice: under serial dependence, pooling
+past claims as exchangeable is not merely suboptimal but can be worse
+than ignoring them entirely.
+
+
+The contributions of this project are threefold. From a theoretical
+perspective, Proposition~1 provides a closed-form expression for the linear
+credibility premium under joint Tweedie and AR(1) assumptions, and
+Corollaries~1 and 2 connect the result to the existing literature: when
+$\rho = 0$, the proposed premium reduces to the Naive premium, while as
+$\rho \to 1$, it converges to the exact credibility formula of
+\citet{ohlsson2006exact}. From a computational
+perspective, the closed-form expression eliminates the need for
+iterative or simulation-based premium calculation: given the structural
+parameters, each individual premium reduces to a $T \times T$
+matrix inversion that is trivially parallelizable across the
+portfolio. From an empirical perspective, the simulation results
+provide a transparent map of the regions in $(\sigma, \rho)$ space where
+the AR(1) refinement yields meaningful predictive gains, offering
+actuaries a quantitative guide to assessing whether the additional
+modeling complexity is justified for a given portfolio.
+
+
+Three limitations of the present study deserve explicit acknowledgment.
+First, the simulation study evaluates the predictive performance of the
+closed-form formula under the assumption that the structural parameters
+$(\bm{\beta}, p, \phi, \sigma, \rho)$ are known, and therefore isolates
+the contribution of the AR(1) structure from the additional uncertainty
+introduced by parameter estimation. Preliminary investigations into
+joint method-of-moments estimation of $(\sigma, \rho)$ revealed that
+the corresponding estimators frequently fall outside the parameter
+space ($\hat{\sigma}^2 < 0$ or $\hat{\rho} \notin (0, 1)$), and a
+likelihood-based or Bayesian estimation procedure would be required for
+empirical deployment. Second, the AR(1) assumption imposes geometric
+decay of correlation with lag, which may be restrictive in settings
+where the latent process exhibits regime changes, structural breaks, or
+long-memory dependence. Third, the present simulation is restricted to
+synthetic data with two covariates and a panel of $T = 5$ training
+periods; its conclusions would need to be confirmed on a real
+insurance dataset with a richer covariate structure and more realistic
+sample sizes.
+
+
+Several extensions of the present framework are natural directions for
+future research. The most immediate priority is the development of a
+joint estimation procedure for $(\sigma, \rho)$ that respects the
+parameter space, most plausibly through a Bayesian formulation with
+weakly informative priors on the latent process parameters, implemented
+via Markov chain Monte Carlo. A second direction is the generalization
+of the latent process from AR(1) to higher-order autoregressive or
+ARMA structures, which would permit more flexible temporal dependence
+patterns at the cost of additional parameters. A third direction is the
+extension of the framework from individual ratemaking to hierarchical
+ratemaking, in which policyholders are nested within regions, agencies,
+or fleets, and the latent process operates at multiple levels of the
+hierarchy simultaneously. Finally, the empirical performance of the
+proposed framework on a real insurance portfolio --- ideally one with
+five or more years of policyholder-level claim history --- would
+provide the definitive test of its practical utility.
+
+The proposed Tweedie AR(1) evolutionary credibility framework
+contributes to the literature on actuarial credibility theory by
+unifying two classical assumptions --- the Tweedie response and the
+random-effects latent structure --- under a single tractable
+formulation that allows the temporal dependence of the latent process
+to be modeled and exploited for prediction. The empirical evidence
+presented in this project supports the conclusion that doing so yields
+predictive accuracy that is uniformly superior to the standard Naive
+benchmark and substantially superior to the classical exchangeable
+Bühlmann benchmark under realistic ranges of the persistence parameter. 
+
+\pagebreak
+
+%WHAT TO DO:
+
+%Start with Point 4! Write the code to compare the four types of premiums. Except for the true premium (which is just a multiplication of marginal expectation of $S$, $\eta$ times the known true random effects $\theta_{T+1}$), the remaining three types of premium can be computed as a function of $\sigma$ and $\rho$, based on Equation (7).
+
+%Once you have the code for Equation (7), then try to compute the premium by just plugging-in the `true' parameter values of $\sigma=0.2$ and $\rho=0.5$ and compare the validation results with the other two premiums (naive and static).
+
+%If it is confirmed that the validation results using the proposed premium are better than those from the naive/static premiums, then we can further proceed to the estimation of the $\sigma$ and $\rho$. 
+
+
+\backmatter%
+    \color{black}
+    \addtoToC{Bibliography}
+    \bibliographystyle{plainnat}
+    \bibliography{mybib}
+
+\begin{appendices} % optional
+%\chapter{Code}
+
+
+\end{appendices}
+
+\end{document}

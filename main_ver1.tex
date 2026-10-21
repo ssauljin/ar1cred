@@ -445,7 +445,7 @@ Tables~\ref{tab:estA} and~\ref{tab:infA} and Figure~\ref{fig:box} summarize the 
 
 \textbf{Specification test.} The $J$ test of the correctly specified S2 has an empirical size of 4--8\% for $v\le0.5$, rising to 9--10\% for $v=1$ and 12--15\% for $v=2$. The over-rejection at large $v$ again reflects the heavy tails of the squared residuals. The $J$ test of S1 rejects almost exactly as often as that of S2. With $T=5$ the test therefore has essentially no power against the gap between $\theta$-scale and log-scale AR(1), which is also inconsequential for prediction (Study B). The $J$ test of the exchangeable S3 has power that increases with $v$ and is highest at moderate $r(1)$.
 
-\textbf{Static and no-dependence tests.} The Wald test of a static latent risk rejects in 8--94\% of replications across the grid. Its power is highest for large $v$ and moderate $r(1)$ and lowest at $r(1)=0.9$, where $\gamma(1),\dots,\gamma(4)$ are nearly flat over a five-year window. The no-dependence test rejects in 7\% of replications in the weakest cell and in 96--100\% whenever $v\ge0.5$ and $r(1)\ge0.5$.
+\textbf{Static and no-dependence tests.} The Wald test of a static latent risk rejects in 8--94\% of replications across the grid. Its power is highest for large $v$ and moderate $r(1)$ and lowest at $r(1)=0.9$, where $\gamma(1),\dots,\gamma(4)$ are nearly flat over a five-year window. The no-dependence test (Table~\ref{tab:infA}) behaves in the opposite way: its power increases with $r(1)$ as well as with $v$, because larger autocovariances are easier to distinguish from zero. It rejects in 7\% of replications in the weakest cell, in 98--100\% whenever $v\ge0.5$ and $r(1)\ge0.5$, and in at least 96\% for every $r(1)$ once $v\ge1$.
 
 \textbf{Boundary.} Fits with $\hat\rho>0.99$ or $\hat v<10^{-3}$ occur in up to 28\% of replications at $v=0.1$, but in at most 2\% when $v\ge0.5$ and $r(1)\le0.7$. Thanks to the reparametrization, such fits remain usable; they correspond to static-like premiums with a small credibility weight.
 
@@ -503,38 +503,40 @@ $v$ & $r(1)$ & S1: $\hat v$ & S1: $\hat r(1)=\hat\rho$ & S2: $\hat v$ & S2: $\ha
 \end{table}
 
 \begin{table}[H]
-\caption{Study A: inference. Coverage (\%) of nominal 95\% Wald intervals for $v$ (log scale) and $r(1)$ under S2, and for $\gamma(1)$ under NP. Rejection rates (\%) at the 5\% level of the $J$ tests of S1, S2 and S3 and of the Wald test of $H_0{:}\ \gamma(1)=\dots=\gamma(T-1)$ (static). Bnd.: share (\%) of S1 fits with $\hat\rho>0.99$ or $\hat v<10^{-3}$.\label{tab:infA}}
+\caption{Study A: inference. Coverage (\%) of nominal 95\% Wald intervals for $v$ (log scale) and $r(1)$ under S2, and for $\gamma(1)$ under NP. Rejection rates (\%) at the 5\% level of the $J$ tests of S1, S2 and S3 and of the Wald tests of $H_0{:}\ \gamma(1)=\dots=\gamma(T-1)$ (static) and $H_0{:}\ \gamma(1)=\dots=\gamma(T-1)=0$ (no dependence). Bnd.: share (\%) of S1 fits with $\hat\rho>0.99$ or $\hat v<10^{-3}$.\label{tab:infA}}
 \small
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}cccccccccc@{}}
+\begin{adjustwidth}{-\extralength}{0cm}
+\begin{tabular*}{\fulllength}{@{\extracolsep{\fill}}ccccccccccc@{}}
 \toprule
- & & \multicolumn{3}{c}{Coverage (\%)} & \multicolumn{4}{c}{Rejection rate (\%)} & \\
-\cmidrule(lr){3-5}\cmidrule(lr){6-9}
-$v$ & $r(1)$ & $v$ (S2) & $r(1)$ (S2) & $\gamma(1)$ (NP) & $J$ S1 & $J$ S2 & $J$ S3 & Static & Bnd. \\
+ & & \multicolumn{3}{c}{Coverage (\%)} & \multicolumn{5}{c}{Rejection rate (\%)} & \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-10}
+$v$ & $r(1)$ & $v$ (S2) & $r(1)$ (S2) & $\gamma(1)$ (NP) & $J$ S1 & $J$ S2 & $J$ S3 & Static & No-dep. & Bnd. \\
 \midrule
 %BEGIN tab_infA
-0.1 & 0.3 & 71.6 & 81.6 & 93.2 & 7.4 & 7.2 & 8.8 & 8.2 & 20.0 \\
-0.1 & 0.5 & 79.4 & 74.6 & 94.6 & 5.6 & 5.6 & 8.8 & 8.4 & 14.8 \\
-0.1 & 0.7 & 86.0 & 80.4 & 94.4 & 6.4 & 6.6 & 10.4 & 11.2 & 20.2 \\
-0.1 & 0.9 & 87.8 & 84.8 & 92.8 & 5.2 & 4.8 & 7.2 & 7.6 & 27.8 \\
-0.25 & 0.3 & 86.2 & 80.0 & 95.2 & 6.6 & 6.8 & 20.4 & 18.0 & 6.0 \\
-0.25 & 0.5 & 90.8 & 81.4 & 93.8 & 4.4 & 4.4 & 25.0 & 24.2 & 5.4 \\
-0.25 & 0.7 & 91.2 & 89.2 & 93.8 & 5.0 & 5.0 & 25.0 & 24.8 & 7.8 \\
-0.25 & 0.9 & 94.8 & 95.2 & 93.0 & 6.0 & 5.8 & 12.2 & 10.4 & 19.8 \\
-0.5 & 0.3 & 87.6 & 82.4 & 93.2 & 8.0 & 7.8 & 38.2 & 38.0 & 1.6 \\
-0.5 & 0.5 & 87.8 & 80.4 & 92.2 & 5.8 & 6.4 & 55.0 & 54.4 & 0.4 \\
-0.5 & 0.7 & 93.0 & 90.0 & 92.4 & 5.2 & 5.8 & 48.2 & 50.6 & 1.0 \\
-0.5 & 0.9 & 97.2 & 95.6 & 94.0 & 6.0 & 7.6 & 13.6 & 14.2 & 14.4 \\
-1 & 0.3 & 85.4 & 81.4 & 93.4 & 9.8 & 10.4 & 74.6 & 71.0 & 0.4 \\
-1 & 0.5 & 88.8 & 85.4 & 92.8 & 8.0 & 9.6 & 83.2 & 83.0 & 0.0 \\
-1 & 0.7 & 89.0 & 87.4 & 89.8 & 7.2 & 8.8 & 71.6 & 72.4 & 0.0 \\
-1 & 0.9 & 91.0 & 92.4 & 89.4 & 7.2 & 9.2 & 25.8 & 24.8 & 9.4 \\
-2 & 0.3 & 87.8 & 79.2 & 90.2 & 9.0 & 12.2 & 92.6 & 90.8 & 0.0 \\
-2 & 0.5 & 85.4 & 80.8 & 85.0 & 9.2 & 11.6 & 93.6 & 94.2 & 0.0 \\
-2 & 0.7 & 82.2 & 83.0 & 85.4 & 8.6 & 14.0 & 81.0 & 83.2 & 0.6 \\
-2 & 0.9 & 75.2 & 92.6 & 78.4 & 9.8 & 14.8 & 30.8 & 27.8 & 7.8 \\
+0.1 & 0.3 & 71.6 & 81.6 & 93.2 & 7.4 & 7.2 & 8.8 & 8.2 & 7.2 & 20.0 \\
+0.1 & 0.5 & 79.4 & 74.6 & 94.6 & 5.6 & 5.6 & 8.8 & 8.4 & 13.4 & 14.8 \\
+0.1 & 0.7 & 86.0 & 80.4 & 94.4 & 6.4 & 6.6 & 10.4 & 11.2 & 34.4 & 20.2 \\
+0.1 & 0.9 & 87.8 & 84.8 & 92.8 & 5.2 & 4.8 & 7.2 & 7.6 & 62.2 & 27.8 \\
+0.25 & 0.3 & 86.2 & 80.0 & 95.2 & 6.6 & 6.8 & 20.4 & 18.0 & 23.6 & 6.0 \\
+0.25 & 0.5 & 90.8 & 81.4 & 93.8 & 4.4 & 4.4 & 25.0 & 24.2 & 62.8 & 5.4 \\
+0.25 & 0.7 & 91.2 & 89.2 & 93.8 & 5.0 & 5.0 & 25.0 & 24.8 & 96.2 & 7.8 \\
+0.25 & 0.9 & 94.8 & 95.2 & 93.0 & 6.0 & 5.8 & 12.2 & 10.4 & 100.0 & 19.8 \\
+0.5 & 0.3 & 87.6 & 82.4 & 93.2 & 8.0 & 7.8 & 38.2 & 38.0 & 59.4 & 1.6 \\
+0.5 & 0.5 & 87.8 & 80.4 & 92.2 & 5.8 & 6.4 & 55.0 & 54.4 & 98.2 & 0.4 \\
+0.5 & 0.7 & 93.0 & 90.0 & 92.4 & 5.2 & 5.8 & 48.2 & 50.6 & 99.8 & 1.0 \\
+0.5 & 0.9 & 97.2 & 95.6 & 94.0 & 6.0 & 7.6 & 13.6 & 14.2 & 100.0 & 14.4 \\
+1 & 0.3 & 85.4 & 81.4 & 93.4 & 9.8 & 10.4 & 74.6 & 71.0 & 96.0 & 0.4 \\
+1 & 0.5 & 88.8 & 85.4 & 92.8 & 8.0 & 9.6 & 83.2 & 83.0 & 100.0 & 0.0 \\
+1 & 0.7 & 89.0 & 87.4 & 89.8 & 7.2 & 8.8 & 71.6 & 72.4 & 99.8 & 0.0 \\
+1 & 0.9 & 91.0 & 92.4 & 89.4 & 7.2 & 9.2 & 25.8 & 24.8 & 99.8 & 9.4 \\
+2 & 0.3 & 87.8 & 79.2 & 90.2 & 9.0 & 12.2 & 92.6 & 90.8 & 99.0 & 0.0 \\
+2 & 0.5 & 85.4 & 80.8 & 85.0 & 9.2 & 11.6 & 93.6 & 94.2 & 99.8 & 0.0 \\
+2 & 0.7 & 82.2 & 83.0 & 85.4 & 8.6 & 14.0 & 81.0 & 83.2 & 100.0 & 0.6 \\
+2 & 0.9 & 75.2 & 92.6 & 78.4 & 9.8 & 14.8 & 30.8 & 27.8 & 99.4 & 7.8 \\
 %END tab_infA
 \bottomrule
 \end{tabular*}
+\end{adjustwidth}
 \end{table}
 
 \subsection{Study B: Predictive Performance}

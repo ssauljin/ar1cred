@@ -113,10 +113,10 @@ rows = []
 for v in V_GRID:
     for r1 in R_GRID:
         r = load(gname(v, r1))
-        rows.append('%g & %g & %s & %s & %s & %s & %s & %s & %s & %s \\\\' % (
+        rows.append('%g & %g & %s & %s & %s & %s & %s & %s & %s & %s & %s \\\\' % (
             v, r1, f(100 * np.mean(r['S2_cov_v']), 1), f(100 * np.mean(r['S2_cov_r1']), 1),
             f(100 * np.mean(r['np_cov_g1']), 1), rej(r['S1_pJ']), rej(r['S2_pJ']), rej(r['S3_pJ']),
-            rej(r['p_static']), f(100 * np.mean(r['S1_boundary']), 1)))
+            rej(r['p_static']), rej(r['p_nodep']), f(100 * np.mean(r['S1_boundary']), 1)))
         summary[gname(v, r1)].update(cov_v=float(np.mean(r['S2_cov_v'])), cov_r=float(np.mean(r['S2_cov_r1'])),
                                      J1=float(np.mean(r['S1_pJ'] < .05)), J2=float(np.mean(r['S2_pJ'] < .05)),
                                      static=float(np.mean(r['p_static'] < .05)),

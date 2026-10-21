@@ -111,7 +111,7 @@ Policyholders $i=1,\dots,I$ are observed in years $t=1,\dots,T_i$, and the targe
 \textbf{Symbol} & \textbf{Meaning} \\
 \midrule
 $\mu_{it}=\exp(\bx_{it}^\top\bbeta)$, $\bmu_i$ & GLM mean and its vector $(\mu_{i1},\dots,\mu_{iT})^\top$ \\
-$\theta_{it}$ & latent multiplicative risk factor, $\E\theta_{it}=1$ \\
+$\theta_{it}$ & latent multiplicative risk factor, $\E[\theta_{it}]=1$ \\
 $v=\Var(\theta_{it})$ & latent variance ($\theta$ scale) \\
 $\gamma(k)$, $r(k)=\gamma(k)/v$ & latent autocovariance $\Cov(\theta_{it},\theta_{i,t+k})$ and autocorrelation; $\gamma(0)=v$ \\
 $a=\phi\,\E[\theta_{it}^p]$ & nugget (within-variance) constant \\
@@ -130,17 +130,17 @@ $W_{it}=\log\theta_{it}$, $\sigma_W^2$, $\rho_W$ & log-scale variance and AR(1) 
 For each policyholder $i$, conditional on the covariates:
 \begin{enumerate}
 \item[(A1)] $Z_{it}\mid\boldsymbol{\theta}_i\sim\Tw(\mu_{it}\theta_{it},\phi,p)$ with $1<p<2$, so that $\E[Z_{it}\mid\boldsymbol\theta_i]=\mu_{it}\theta_{it}$ and $\Var(Z_{it}\mid\boldsymbol\theta_i)=\phi(\mu_{it}\theta_{it})^p$. The $Z_{it}$ are conditionally independent over $t$ given the latent path $\boldsymbol\theta_i=(\theta_{i1},\theta_{i2},\dots)$.
-\item[(A2)] $\theta_{it}>0$, $\E\theta_{it}=1$ and $\E\theta_{it}^2<\infty$.
+\item[(A2)] $\theta_{it}>0$, $\E[\theta_{it}]=1$ and $\E[\theta_{it}^2]<\infty$.
 \item[(A3)] $(\theta_{it})_t$ is second-order stationary: $\Cov(\theta_{it},\theta_{is})=\gamma(|t-s|)$ with $v=\gamma(0)>0$.
 \item[(A4)] $\E[\theta_{it}^p]$ does not depend on $t$ (this holds, e.g., under strict stationarity).
 \item[(A5)] Policyholders are mutually independent.
 \end{enumerate}
 \end{Assumption}
 
-The normalization $\E\theta_{it}=1$ makes $\mu_{it}$ the marginal mean, $\E Z_{it}=\mu_{it}$, and separates the latent factor from the GLM intercept. By Jensen's and Lyapunov's inequalities, $1\le\E\theta^p\le(1+v)^{p-1}$ for $1<p<2$, so $a$ is finite under (A2). Assumptions (A1)--(A5) restrict only the first two moments of the latent process and the mean--variance relation of the response. No distributional assumption on $\theta$ is needed. As shown below, the fractional moment $\E\theta^p$ enters only through $a$, and $a$ is identified from the data.
+The normalization $\E[\theta_{it}]=1$ makes $\mu_{it}$ the marginal mean, $\E[Z_{it}]=\mu_{it}$, and separates the latent factor from the GLM intercept. By Jensen's and Lyapunov's inequalities, $1\le\E[\theta^p]\le(1+v)^{p-1}$ for $1<p<2$, so $a$ is finite under (A2). Assumptions (A1)--(A5) restrict only the first two moments of the latent process and the mean--variance relation of the response. No distributional assumption on $\theta$ is needed. As shown below, the fractional moment $\E[\theta^p]$ enters only through $a$, and $a$ is identified from the data.
 
 \begin{Lemma}[Second-moment structure]\label{lem:moments}
-Under Assumption~\ref{ass:model}, $\E e_{it}=0$ and
+Under Assumption~\ref{ass:model}, $\E[e_{it}]=0$ and
 \begin{equation}\label{eq:moments}
 \Cov(e_{it},e_{is})=\gamma(|t-s|)+\mathbb{1}\{t=s\}\,a\,q_{it},\qquad t,s\ge1 .
 \end{equation}
@@ -159,7 +159,7 @@ Any positive-semidefinite autocovariance $\gamma(\cdot)$ is allowed. The followi
 \item \emph{$\theta$-scale AR(1):} $\gamma(k)=v\rho^k$, $0\le\rho<1$. Any positive process with $\E[\theta_{t+1}\mid\theta_t,\theta_{t-1},\ldots]=1-\rho+\rho\theta_t$ has this autocovariance, for example the gamma autoregressive sequences of \citet{gaver1980}.
 \item \emph{Log-normal AR(1):} $W_{it}=\log\theta_{it}$ is a stationary Gaussian AR(1) with variance $\sigma_W^2$, autocorrelation $\rho_W$ and mean $-\sigma_W^2/2$. Then
 \begin{equation}\label{eq:logar1}
-v=e^{\sigma_W^2}-1,\qquad \gamma(k)=\exp(\sigma_W^2\rho_W^k)-1,\qquad \E\theta^p=\exp\{\sigma_W^2p(p-1)/2\}.
+v=e^{\sigma_W^2}-1,\qquad \gamma(k)=\exp(\sigma_W^2\rho_W^k)-1,\qquad \E[\theta^p]=\exp\{\sigma_W^2p(p-1)/2\}.
 \end{equation}
 The $\theta$-scale autocorrelation $r(k)=\{\exp(\sigma_W^2\rho_W^k)-1\}/\{\exp(\sigma_W^2)-1\}$ is \emph{not} geometric. By convexity, $r(k)\le\rho_W^k$. For given $(v,r(1))$, the log-scale parameters are $\sigma_W^2=\log(1+v)$ and $\rho_W=\log\{1+v\,r(1)\}/\sigma_W^2$.
 \item \emph{Other structures:} ARMA, long-memory (ARFIMA) and regime-switching processes for $\log\theta_{it}$ or for $\theta_{it}$. Each implies its own $\gamma(\cdot)$, and Theorem~\ref{thm:main} applies unchanged.
@@ -182,12 +182,12 @@ P_{T+1}=\mu_{T+1}\Big\{1+\bc_T^\top(\Gamma_T+D_T)^{-1}\be_T\Big\}=\mu_{T+1}\Big(
 \end{equation}
 where $\Gamma_T=[\gamma(|t-s|)]_{t,s\le T}$, $D_T=\diag(a\mu_1^{p-2},\dots,a\mu_T^{p-2})$, $\bc_T=(\gamma(T),\dots,\gamma(1))^\top$ and $\be_T=(e_1,\dots,e_T)^\top$. The mean squared error is
 \[
-\E(Z_{T+1}-P_{T+1})^2=\mu_{T+1}^2\big\{v+a\mu_{T+1}^{p-2}-\bc_T^\top(\Gamma_T+D_T)^{-1}\bc_T\big\}.
+\E[(Z_{T+1}-P_{T+1})^2]=\mu_{T+1}^2\big\{v+a\mu_{T+1}^{p-2}-\bc_T^\top(\Gamma_T+D_T)^{-1}\bc_T\big\}.
 \]
 \end{Theorem}
 
 \begin{proof}
-Since $Z_t=\mu_t(1+e_t)$ with known $\mu_t$, linear predictors in $(1,Z_1,\dots,Z_T)$ and in $(1,e_1,\dots,e_T)$ coincide. Because $\E\be_T=\boldsymbol0$, the best linear predictor of $e_{T+1}$ given $\be_T$ is
+Since $Z_t=\mu_t(1+e_t)$ with known $\mu_t$, linear predictors in $(1,Z_1,\dots,Z_T)$ and in $(1,e_1,\dots,e_T)$ coincide. Because $\E[\be_T]=\boldsymbol0$, the best linear predictor of $e_{T+1}$ given $\be_T$ is
 \[
 \Cov(e_{T+1},\be_T)\,\Var(\be_T)^{-1}\be_T .
 \]
@@ -214,7 +214,7 @@ This is the Tweedie credibility estimator of \citet{ohlsson2006exact}: a B\"uhlm
 \end{proof}
 
 \begin{Remark}[Which moments of $\theta$ matter]\label{rem:moments}
-The premium depends on the latent law only through $\gamma(\cdot)$ and the fractional moment $\E\theta^p$. The latter enters only through the product $a=\phi\,\E\theta^p$, which is identified from the diagonal second moments of $e_{it}$ (Section~\ref{sec:estimation}). Neither $\phi$ nor $\E\theta^p$ needs to be known separately, and no distributional assumption on $\theta$ is required. Formulas such as $\E\theta^p=(1+v)^{p(p-1)/2}$ hold only for specific constructions (here, a log-normal marginal with variance $v$) and are not used for estimation.
+The premium depends on the latent law only through $\gamma(\cdot)$ and the fractional moment $\E[\theta^p]$. The latter enters only through the product $a=\phi\,\E[\theta^p]$, which is identified from the diagonal second moments of $e_{it}$ (Section~\ref{sec:estimation}). Neither $\phi$ nor $\E[\theta^p]$ needs to be known separately, and no distributional assumption on $\theta$ is required. Formulas such as $\E[\theta^p]=(1+v)^{p(p-1)/2}$ hold only for specific constructions (here, a log-normal marginal with variance $v$) and are not used for estimation.
 \end{Remark}
 
 \subsection{AR(1) Dependence: Recursion, Positivity and Bounds}
@@ -269,7 +269,7 @@ The lag moments \eqref{eq:lagmom} do not depend on $\phi$, $p$ or the law of $\t
 
 \subsection{Two-Step Estimator}
 
-\textbf{Stage 1: mean structure.} Fit the Tweedie quasi-likelihood GLM under working independence, i.e., solve $\sum_{i,t}\bx_{it}(Z_{it}-\mu_{it})\mu_{it}^{1-p}=\boldsymbol0$. The estimator $\widehat\bbeta$ is consistent because $\E Z_{it}=\mu_{it}$ \citep{wedderburn1974}, whatever the serial dependence. Set $\hat\mu_{it}=\exp(\bx_{it}^\top\widehat\bbeta)$, $\hat e_{it}=Z_{it}/\hat\mu_{it}-1$ and $\hat q_{it}=\hat\mu_{it}^{p-2}$.
+\textbf{Stage 1: mean structure.} Fit the Tweedie quasi-likelihood GLM under working independence, i.e., solve $\sum_{i,t}\bx_{it}(Z_{it}-\mu_{it})\mu_{it}^{1-p}=\boldsymbol0$. The estimator $\widehat\bbeta$ is consistent because $\E[Z_{it}]=\mu_{it}$ \citep{wedderburn1974}, whatever the serial dependence. Set $\hat\mu_{it}=\exp(\bx_{it}^\top\widehat\bbeta)$, $\hat e_{it}=Z_{it}/\hat\mu_{it}-1$ and $\hat q_{it}=\hat\mu_{it}^{p-2}$.
 
 \textbf{Stage 2: weighted moment contributions.} Collect the second-moment parameters in
 \[
@@ -310,10 +310,10 @@ All structures are therefore fitted to the same $T+1$ summary statistics with th
 
 \subsection{Asymptotic Theory}
 
-Let $\boldsymbol s_i(\bbeta)=\sum_t\bx_{it}(Z_{it}-\mu_{it})\mu_{it}^{1-p}$ be the stage-1 quasi-score and $S=\E\,\partial\boldsymbol s_i/\partial\bbeta^\top$. Stage 1 matters for inference: since $\partial e_{it}/\partial\bbeta=-\bx_{it}(1+e_{it})$, we have $\E\,\partial(e_{it}e_{is})/\partial\bbeta=-(\bx_{it}+\bx_{is})\gamma(|t-s|)\ne\boldsymbol0$ for $t\ne s$. Let $G_\beta=\E\,\partial\boldsymbol m_i/\partial\bbeta^\top$ and define the corrected contributions $\tilde{\boldsymbol m}_i=\boldsymbol m_i-G_\beta S^{-1}\boldsymbol s_i$. This is the influence function of the stacked estimator \citep[Section~6]{newey1994}.
+Let $\boldsymbol s_i(\bbeta)=\sum_t\bx_{it}(Z_{it}-\mu_{it})\mu_{it}^{1-p}$ be the stage-1 quasi-score and $S=\E[\partial\boldsymbol s_i/\partial\bbeta^\top]$. Stage 1 matters for inference: since $\partial e_{it}/\partial\bbeta=-\bx_{it}(1+e_{it})$, we have $\E[\partial(e_{it}e_{is})/\partial\bbeta]=-(\bx_{it}+\bx_{is})\gamma(|t-s|)\ne\boldsymbol0$ for $t\ne s$. Let $G_\beta=\E[\partial\boldsymbol m_i/\partial\bbeta^\top]$ and define the corrected contributions $\tilde{\boldsymbol m}_i=\boldsymbol m_i-G_\beta S^{-1}\boldsymbol s_i$. This is the influence function of the stacked estimator \citep[Section~6]{newey1994}.
 
 \begin{Proposition}\label{prop:asy}
-Suppose Assumption~\ref{ass:model} holds with $(\bx_i,\boldsymbol\theta_i,\boldsymbol Z_i)$ i.i.d.\ across $i$, $\E\theta_{it}^4<\infty$, bounded covariates and a nonsingular $\E[\sum_t\omega_{it}\boldsymbol z_{it}\boldsymbol z_{it}^\top]$. Let $T$ be fixed and $I\to\infty$. Then
+Suppose Assumption~\ref{ass:model} holds with $(\bx_i,\boldsymbol\theta_i,\boldsymbol Z_i)$ i.i.d.\ across $i$, $\E[\theta_{it}^4]<\infty$, bounded covariates and a nonsingular $\E[\sum_t\omega_{it}\boldsymbol z_{it}\boldsymbol z_{it}^\top]$. Let $T$ be fixed and $I\to\infty$. Then
 \begin{enumerate}
 \item[(i)] $\sqrt I(\widehat\boeta-\boeta_0)\to N(\boldsymbol0,V_\infty)$ with $V_\infty=\bar A^{-1}\Omega\bar A^{-\top}$ and $\Omega=\Var(\tilde{\boldsymbol m}_i)$;
 \item[(ii)] if $\boeta_0=\boeta(\bpsi_0)$ with $\bpsi_0$ interior, $\boeta(\cdot)$ is injective and continuously differentiable, and $H=\partial\boeta/\partial\bpsi^\top$ has full column rank at $\bpsi_0$, then $\sqrt I(\widehat\bpsi-\bpsi_0)\to N(\boldsymbol0,(H^\top V_\infty^{-1}H)^{-1})$;
@@ -368,7 +368,7 @@ In practice, $G_\beta$ is computed by numerical differentiation of $\bar{\boldsy
 
 \textbf{Metrics.} For prediction, we report the paired relative reduction of out-of-sample MSE versus the naive premium, averaged over replications with Monte Carlo standard errors. We also report the share of the oracle gain,
 \[
-\text{share}(M)=\frac{\mathrm{PE}_{\rm naive}-\mathrm{PE}_M}{\mathrm{PE}_{\rm naive}-\mathrm{PE}_{\rm oracle\ param}},\qquad \mathrm{PE}_M=\E(\mu_{T+1}\theta_{T+1}-P^M_{T+1})^2,
+\text{share}(M)=\frac{\mathrm{PE}_{\rm naive}-\mathrm{PE}_M}{\mathrm{PE}_{\rm naive}-\mathrm{PE}_{\rm oracle\ param}},\qquad \mathrm{PE}_M=\E[(\mu_{T+1}\theta_{T+1}-P^M_{T+1})^2],
 \]
 which uses the premium error to remove the irreducible Tweedie noise (Appendix~\ref{app:mse}); its standard error is computed by bootstrapping replications. We also report the fraction of replications in which a method beats the naive premium, and the mean Tweedie deviance. For estimation, we report medians and interquartile ranges (the sampling distributions are skewed), coverage of 95\% Wald intervals, rejection rates of the $J$ and Wald tests at the 5\% level, and the frequency of estimates near the boundary ($\hat\rho>0.99$ or $\hat v<10^{-3}$).
 
@@ -413,7 +413,7 @@ $v$ & $r(1)$ & Zero (\%) & Naive MSE & OP gain (\%) & BE gain (\%) & OP MSE (exa
 
 Tables~\ref{tab:estA} and~\ref{tab:infA} and Figure~\ref{fig:box} summarize the estimator. Five findings stand out.
 
-\textbf{Point estimates.} Both parametric fits recover the latent variance and the lag-1 correlation well whenever there is a non-negligible latent signal. In the central cell ($v=0.5$, $r(1)=0.7$), the medians are $\hat v=0.50$ (S1) and $0.51$ (S2), and $\hat r(1)=0.68$ and $0.67$. The S1 working model is misspecified for $k\ge2$, yet its $\hat v$ and $\hat\rho$ are almost indistinguishable from the S2 estimates of $v$ and $r(1)$. At $v=2$, the median S1 estimate of $v$ is 3--13\% below the truth (S2: between $-14\%$ and $+9\%$), a consequence of the very heavy tails of $e_{it}^2$ ($\E\theta^4\approx735$). At $v=0.1$, the signal is weak relative to the nugget ($v/(aq)\approx0.03$ for a typical policy). Here $\hat v$ is biased upward, and $\hat r(1)$ is shrunk toward zero when $r(1)$ is small.
+\textbf{Point estimates.} Both parametric fits recover the latent variance and the lag-1 correlation well whenever there is a non-negligible latent signal. In the central cell ($v=0.5$, $r(1)=0.7$), the medians are $\hat v=0.50$ (S1) and $0.51$ (S2), and $\hat r(1)=0.68$ and $0.67$. The S1 working model is misspecified for $k\ge2$, yet its $\hat v$ and $\hat\rho$ are almost indistinguishable from the S2 estimates of $v$ and $r(1)$. At $v=2$, the median S1 estimate of $v$ is 3--13\% below the truth (S2: between $-14\%$ and $+9\%$), a consequence of the very heavy tails of $e_{it}^2$ ($\E[\theta^4]\approx735$). At $v=0.1$, the signal is weak relative to the nugget ($v/(aq)\approx0.03$ for a typical policy). Here $\hat v$ is biased upward, and $\hat r(1)$ is shrunk toward zero when $r(1)$ is small.
 
 \textbf{Coverage.} With $0.25\le v\le1$ and $r(1)\ge0.5$, Wald intervals for $v$ and $r(1)$ under S2 cover the truth in 80--97\% of replications. Coverage drops to 72--88\% in the weak-signal cells ($v=0.1$) and, for $v$, in the heavy-tailed cells ($v=2$). Intervals for the nonparametric $\gamma(1)$, a linear moment, are closer to nominal: 89--95\% for $v\le1$ and 78--90\% at $v=2$. Table~\ref{tab:boot} reports a cluster bootstrap of the whole two-stage procedure. In the weak-signal cell it restores near-nominal coverage (94.5\% for $v$ and 92\% for $r(1)$, against 72\% and 78.5\% for Wald intervals), and bias correction removes the upward bias of $\hat v$ (median 0.10 against 0.15). In the heavy-tailed cell ($v=2$, $r(1)=0.9$) it does not help for $v$: coverage stays near 75\%, and the median $\hat v$ remains 18--20\% below the truth, with or without bias correction, in these 200 replications. There, the sampling distribution of $\hat v$ is driven by rare extreme residuals that a resample of 2000 policies does not reproduce. Intervals for $r(1)$ are reliable in all three cells.
 
@@ -721,7 +721,7 @@ NP & nonparametric (autocovariance) \\
 \section{Proofs}\label{app:proofs}
 
 \textbf{Proof of Proposition~\ref{prop:kalman}.}
-\emph{(a)} Let $\hat x_t$ be the best linear predictor of $x_t$ given $(1,e_1,\dots,e_{t-1})$, and let $V_t$ be its MSE. Then $\hat x_1=\E x_1=0$ and $V_1=v$. The innovation $e_t-\hat x_t=(x_t-\hat x_t)+\varepsilon_t$ has variance $V_t+d_t$, because $\varepsilon_t$ is uncorrelated with $x_t$ and with the past. Projecting $x_t$ on the innovation gives $\hat x_{t\mid t}=\hat x_t+K_t(e_t-\hat x_t)$, with MSE $(1-K_t)V_t$. Since $\eta_t=x_{t+1}-\rho x_t$ is uncorrelated with $(e_1,\dots,e_t)$, we get $\hat x_{t+1}=\rho\hat x_{t\mid t}$ and $V_{t+1}=\rho^2(1-K_t)V_t+\Var\eta_t$. Finally, $\varepsilon_{T+1}$ is uncorrelated with $(e_1,\dots,e_T)$, so the best linear predictor of $e_{T+1}$ is $\hat x_{T+1}$. The best linear predictor is unique, so it coincides with \eqref{eq:premium}. See \citet[Proposition~12.2.2]{brockwell1991} for the general wide-sense Kalman recursions.
+\emph{(a)} Let $\hat x_t$ be the best linear predictor of $x_t$ given $(1,e_1,\dots,e_{t-1})$, and let $V_t$ be its MSE. Then $\hat x_1=\E[x_1]=0$ and $V_1=v$. The innovation $e_t-\hat x_t=(x_t-\hat x_t)+\varepsilon_t$ has variance $V_t+d_t$, because $\varepsilon_t$ is uncorrelated with $x_t$ and with the past. Projecting $x_t$ on the innovation gives $\hat x_{t\mid t}=\hat x_t+K_t(e_t-\hat x_t)$, with MSE $(1-K_t)V_t$. Since $\eta_t=x_{t+1}-\rho x_t$ is uncorrelated with $(e_1,\dots,e_t)$, we get $\hat x_{t+1}=\rho\hat x_{t\mid t}$ and $V_{t+1}=\rho^2(1-K_t)V_t+\Var\eta_t$. Finally, $\varepsilon_{T+1}$ is uncorrelated with $(e_1,\dots,e_T)$, so the best linear predictor of $e_{T+1}$ is $\hat x_{T+1}$. The best linear predictor is unique, so it coincides with \eqref{eq:premium}. See \citet[Proposition~12.2.2]{brockwell1991} for the general wide-sense Kalman recursions.
 
 \emph{(b)} Unrolling $\hat x_{t+1}=\rho(1-K_t)\hat x_t+\rho K_te_t$ from $\hat x_1=0$ gives the stated coefficients. Since $V_1=v>0$, $V_{t+1}\ge(1-\rho^2)v>0$ and $0<d_t<\infty$, we have $K_t\in(0,1)$, so $w_t>0$ when $\rho>0$.
 
@@ -747,9 +747,9 @@ Let $P=\mu_{T+1}(1+\bw^\top\be_T)$, where $\bw$ is any weight vector that depend
 \end{equation}
 Averaging \eqref{eq:exactmse} over the covariate distribution (here over $2\times10^6$ simulated policies) gives the exact population MSE of the naive premium ($\bw=\boldsymbol0$), of the oracle-parameter premium ($\bw=(\Gamma_T+D_T)^{-1}\bc_T$) and of every exchangeable premium. The \emph{best exchangeable} premium minimizes the population MSE over the static credibility constant, using the true $a$ and $\bmu$. Moreover, if $P$ is any function of the training data, then $\E[Z_{T+1}-\mu_{T+1}\theta_{T+1}\mid\boldsymbol\theta,\mathcal{F}_T]=0$ implies
 \[
-\E(Z_{T+1}-P)^2=\E(\mu_{T+1}\theta_{T+1}-P)^2+\E\big[a\mu_{T+1}^{p}\big].
+\E[(Z_{T+1}-P)^2]=\E[(\mu_{T+1}\theta_{T+1}-P)^2]+\E\big[a\mu_{T+1}^{p}\big].
 \]
-Differences in out-of-sample MSE between premiums therefore equal differences in the \emph{premium error} $\E(\mu_{T+1}\theta_{T+1}-P)^2$. The premium error excludes the irreducible Tweedie noise and has a much smaller Monte Carlo variance.
+Differences in out-of-sample MSE between premiums therefore equal differences in the \emph{premium error} $\E[(\mu_{T+1}\theta_{T+1}-P)^2]$. The premium error excludes the irreducible Tweedie noise and has a much smaller Monte Carlo variance.
 
 \section{Computational Details}\label{app:computation}
 

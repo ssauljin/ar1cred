@@ -365,7 +365,7 @@ In practice, $G_\beta$ is computed by numerical differentiation of $\bar{\boldsy
 \item \emph{S2} and \emph{NP}: structure S2 and the nonparametric autocovariances, plugged into Theorem~\ref{thm:main}.
 \item \emph{S1 lag-only} and \emph{S1 equal weights}: the robustness variants of Section~\ref{sec:estimation}.
 \item \emph{Oracle parameters}: Theorem~\ref{thm:main} with the true $(\bbeta,\gamma,a)$, i.e., the best linear premium.
-\item \emph{Best exchangeable}: the best static premium with true moments (Appendix~\ref{app:mse}).
+\item \emph{Best exchangeable}: the static premium of Corollary~\ref{cor:special}(ii) with the true $\bbeta$ and $a$ and the credibility constant chosen to minimize the population MSE under the true $\gamma(\cdot)$ (Appendix~\ref{app:mse}).
 \item \emph{Oracle $\theta$}: $\mu_{i,T+1}\theta_{i,T+1}$, which is not a linear premium.
 \end{itemize}
 
@@ -748,7 +748,7 @@ Let $P=\mu_{T+1}(1+\bw^\top\be_T)$, where $\bw$ is any weight vector that depend
 \begin{equation}\label{eq:exactmse}
 \E[(Z_{T+1}-P)^2\mid\bx]=\mu_{T+1}^2\big\{v+a\mu_{T+1}^{p-2}-2\bw^\top\bc_T+\bw^\top(\Gamma_T+D_T)\bw\big\}.
 \end{equation}
-Averaging \eqref{eq:exactmse} over the covariate distribution (here over $2\times10^6$ simulated policies) gives the exact population MSE of the naive premium ($\bw=\boldsymbol0$), of the oracle-parameter premium ($\bw=(\Gamma_T+D_T)^{-1}\bc_T$) and of every exchangeable premium. The \emph{best exchangeable} premium minimizes the population MSE over the static credibility constant, using the true $a$ and $\bmu$. Moreover, if $P$ is any function of the training data, then $\E[Z_{T+1}-\mu_{T+1}\theta_{T+1}\mid\boldsymbol\theta,\mathcal{F}_T]=0$ implies
+Averaging \eqref{eq:exactmse} over the covariate distribution (here over $2\times10^6$ simulated policies) gives the exact population MSE of the naive premium ($\bw=\boldsymbol0$), of the oracle-parameter premium ($\bw=(\Gamma_T+D_T)^{-1}\bc_T$) and of every exchangeable premium. The \emph{best exchangeable} premium uses the true $a$ and $\bmu$ and chooses the static constant $v_s$ in Corollary~\ref{cor:special}(ii) to minimize this population MSE under the true $\gamma(\cdot)$; $v_s$ generally differs from $v$ and acts as an average covariance across lags. Moreover, if $P$ is any function of the training data, then $\E[Z_{T+1}-\mu_{T+1}\theta_{T+1}\mid\boldsymbol\theta,\mathcal{F}_T]=0$ implies
 \[
 \E[(Z_{T+1}-P)^2]=\E[(\mu_{T+1}\theta_{T+1}-P)^2]+\E\big[a\mu_{T+1}^{p}\big].
 \]

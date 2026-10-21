@@ -366,7 +366,7 @@ In practice, $G_\beta$ is computed by numerical differentiation of $\bar{\boldsy
 \item \emph{S1 lag-only} and \emph{S1 equal weights}: the robustness variants of Section~\ref{sec:estimation}.
 \item \emph{Oracle parameters}: Theorem~\ref{thm:main} with the true $(\bbeta,\gamma,a)$, i.e., the best linear premium.
 \item \emph{Best exchangeable}: the static premium of Corollary~\ref{cor:special}(ii) with the true $\bbeta$ and $a$ and the credibility constant chosen to minimize the population MSE under the true $\gamma(\cdot)$ (Appendix~\ref{app:mse}).
-\item \emph{Oracle $\theta$}: $\mu_{i,T+1}\theta_{i,T+1}$, which is not a linear premium.
+\item \emph{Oracle $\theta$}: $\mu_{i,T+1}\theta_{i,T+1}$, the true conditional mean of next year's claim cost, computed from the true $\bbeta$ and the realized, unobservable latent factor rather than from past claims. Its premium error is zero by construction, so its out-of-sample MSE equals the irreducible Tweedie noise $\E[a\mu_{i,T+1}^p]$, a lower bound for every premium. It is infeasible in practice and serves only to show how much of the MSE no premium can remove.
 \end{itemize}
 
 \textbf{Metrics.} For prediction, we report the paired relative reduction of out-of-sample MSE versus the naive premium, averaged over replications with Monte Carlo standard errors. We also report the share of the oracle gain,

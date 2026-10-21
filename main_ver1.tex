@@ -23,7 +23,8 @@
 
 %=================================================================
 % Packages and commands
-\usepackage{bm, amssymb} 
+\usepackage{bm, amssymb}
+\usepackage{dsfont}
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator{\Var}{Var}
 \DeclareMathOperator{\Cov}{Cov}
@@ -142,7 +143,7 @@ The normalization $\E[\theta_{it}]=1$ makes $\mu_{it}$ the marginal mean, $\E[Z_
 \begin{Lemma}[Second-moment structure]\label{lem:moments}
 Under Assumption~\ref{ass:model}, $\E[e_{it}]=0$ and
 \begin{equation}\label{eq:moments}
-\Cov(e_{it},e_{is})=\gamma(|t-s|)+\mathbb{1}\{t=s\}\,a\,q_{it},\qquad t,s\ge1 .
+\Cov(e_{it},e_{is})=\gamma(|t-s|)+\mathds{1}\{t=s\}\,a\,q_{it},\qquad t,s\ge1 .
 \end{equation}
 \end{Lemma}
 

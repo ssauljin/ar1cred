@@ -151,6 +151,8 @@ Under Assumption~\ref{ass:model}, $\E[e_{it}]=0$ and
 Write $e_{it}=x_{it}+\varepsilon_{it}$ with $x_{it}=\theta_{it}-1$ and $\varepsilon_{it}=(Z_{it}-\mu_{it}\theta_{it})/\mu_{it}$. By (A1), $\E[\varepsilon_{it}\mid\boldsymbol\theta_i]=0$, $\Var(\varepsilon_{it}\mid\boldsymbol\theta_i)=\phi\theta_{it}^p\mu_{it}^{p-2}$ and $\Cov(\varepsilon_{it},\varepsilon_{is}\mid\boldsymbol\theta_i)=0$ for $t\ne s$. Hence the $\varepsilon_{it}$ are uncorrelated with each other and with the latent path, and $\Var(\varepsilon_{it})=\phi\,\E[\theta_{it}^p]\,\mu_{it}^{p-2}=a q_{it}$ by (A4). The result follows from (A3).
 \end{proof}
 
+Intuitively, the decomposition $e_{it}=x_{it}+\varepsilon_{it}$ separates the observable relative surprise $e_{it}$, i.e., how far the claim cost deviates from its GLM premium, into a persistent signal $x_{it}=\theta_{it}-1$, the unobserved deviation of the policyholder's true risk level, and a transient noise $\varepsilon_{it}$, the luck of the claim draw around that level, which is uncorrelated over time and whose variance $a q_{it}$ shrinks as $\mu_{it}$ grows; credibility weighting amounts to extracting the signal from the noisy residuals.
+
 \subsection{Examples of Latent Processes}\label{sec:examples}
 
 Any positive-semidefinite autocovariance $\gamma(\cdot)$ is allowed. The following cases are used below.

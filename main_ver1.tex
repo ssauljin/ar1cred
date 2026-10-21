@@ -148,8 +148,10 @@ Under Assumption~\ref{ass:model}, $\E[e_{it}]=0$ and
 \end{Lemma}
 
 \begin{proof}
-Write $e_{it}=x_{it}+\varepsilon_{it}$ with $x_{it}=\theta_{it}-1$ and $\varepsilon_{it}=(Z_{it}-\mu_{it}\theta_{it})/\mu_{it}$. By (A1), $\E[\varepsilon_{it}\mid\boldsymbol\theta_i]=0$, $\Var(\varepsilon_{it}\mid\boldsymbol\theta_i)=\phi\theta_{it}^p\mu_{it}^{p-2}$ and $\Cov(\varepsilon_{it},\varepsilon_{is}\mid\boldsymbol\theta_i)=0$ for $t\ne s$. Hence the $\varepsilon_{it}$ are uncorrelated with each other and with the latent path, and $\Var(\varepsilon_{it})=\phi\,\E[\theta_{it}^p]\,\mu_{it}^{p-2}=a q_{it}$ by (A4). The result follows from (A3).
+Write $e_{it}=\xi_{it}+\varepsilon_{it}$ with $\xi_{it}=\theta_{it}-1$ and $\varepsilon_{it}=(Z_{it}-\mu_{it}\theta_{it})/\mu_{it}$. By (A1), $\E[\varepsilon_{it}\mid\boldsymbol\theta_i]=0$, $\Var(\varepsilon_{it}\mid\boldsymbol\theta_i)=\phi\theta_{it}^p\mu_{it}^{p-2}$ and $\Cov(\varepsilon_{it},\varepsilon_{is}\mid\boldsymbol\theta_i)=0$ for $t\ne s$. Hence the $\varepsilon_{it}$ are uncorrelated with each other and with the latent path, and $\Var(\varepsilon_{it})=\phi\,\E[\theta_{it}^p]\,\mu_{it}^{p-2}=a q_{it}$ by (A4). The result follows from (A3).
 \end{proof}
+
+Intuitively, the decomposition $e_{it}=\xi_{it}+\varepsilon_{it}$ separates the observable relative surprise $e_{it}$, i.e., how far the claim cost deviates from its GLM premium, into a persistent signal $\xi_{it}=\theta_{it}-1$, the unobserved deviation of the policyholder's true risk level, and a transient noise $\varepsilon_{it}$, the luck of the claim draw around that level, which is uncorrelated over time and whose variance $a q_{it}$ shrinks as $\mu_{it}$ grows; credibility weighting amounts to extracting the signal from the noisy residuals.
 
 \subsection{Examples of Latent Processes}\label{sec:examples}
 
@@ -220,20 +222,20 @@ The premium depends on the latent law only through $\gamma(\cdot)$ and the fract
 
 \subsection{AR(1) Dependence: Recursion, Positivity and Bounds}
 
-For the $\theta$-scale AR(1) structure $\gamma(k)=v\rho^k$, write $x_t=\theta_t-1$ and $d_t=a\mu_t^{p-2}$. Then $\eta_t=x_{t+1}-\rho x_t$ is uncorrelated with $x_s$ for $s\le t$ and with every $\varepsilon_s$, and $\Var(\eta_t)=v(1-\rho^2)$. Hence
+For the $\theta$-scale AR(1) structure $\gamma(k)=v\rho^k$, write $\xi_t=\theta_t-1$ and $d_t=a\mu_t^{p-2}$. Then $\zeta_t=\xi_{t+1}-\rho \xi_t$ is uncorrelated with $\xi_s$ for $s\le t$ and with every $\varepsilon_s$, and $\Var(\zeta_t)=v(1-\rho^2)$. Hence
 \[
-x_{t+1}=\rho x_t+\eta_t,\qquad e_t=x_t+\varepsilon_t,\qquad \Var(\varepsilon_t)=d_t,
+\xi_{t+1}=\rho \xi_t+\zeta_t,\qquad e_t=\xi_t+\varepsilon_t,\qquad \Var(\varepsilon_t)=d_t,
 \]
 is a linear state-space model in the second-order sense. The Kalman recursions therefore compute linear projections exactly, without any Gaussian assumption \citep[Chapter~12]{brockwell1991}; see also \citet{harvey1989}.
 
 \begin{Proposition}\label{prop:kalman}
 Let $\gamma(k)=v\rho^k$ with $0<\rho<1$, and let $d_t=a\mu_t^{p-2}>0$.
 \begin{enumerate}
-\item[(a)] \textup{Updating-type recursion.} Set $\hat x_1=0$, $V_1=v$ and, for $t=1,\dots,T$,
+\item[(a)] \textup{Updating-type recursion.} Set $\hat\xi_1=0$, $V_1=v$ and, for $t=1,\dots,T$,
 \[
-K_t=\frac{V_t}{V_t+d_t},\qquad \hat x_{t+1}=\rho\{(1-K_t)\hat x_t+K_te_t\},\qquad V_{t+1}=\rho^2(1-K_t)V_t+(1-\rho^2)v .
+K_t=\frac{V_t}{V_t+d_t},\qquad \hat\xi_{t+1}=\rho\{(1-K_t)\hat\xi_t+K_te_t\},\qquad V_{t+1}=\rho^2(1-K_t)V_t+(1-\rho^2)v .
 \]
-Then $P_{T+1}=\mu_{T+1}(1+\hat x_{T+1})$ coincides with \eqref{eq:premium}, and $V_{T+1}$ is the prediction MSE of $\theta_{T+1}$.
+Then $P_{T+1}=\mu_{T+1}(1+\hat\xi_{T+1})$ coincides with \eqref{eq:premium}, and $V_{T+1}$ is the prediction MSE of $\theta_{T+1}$.
 \item[(b)] \textup{Weights.} $w_t=\rho^{T+1-t}K_t\prod_{s=t+1}^{T}(1-K_s)>0$ for $t=1,\dots,T$.
 \item[(c)] \textup{Total credibility.} $S_T=\sum_{t=1}^Tw_t$ satisfies $S_{t}=\rho\{(1-K_t)S_{t-1}+K_t\}$ with $S_0=0$, and $0<S_T<\rho$.
 \item[(d)] \textup{Positivity and bonus bound.} $P_{T+1}\ge\mu_{T+1}(1-S_T)>(1-\rho)\mu_{T+1}>0$. The maximal bonus, attained by a claim-free history, is $S_T<\rho$, so the premium discount never exceeds $100\rho\%$. The malus is unbounded.
@@ -722,11 +724,11 @@ NP & nonparametric (autocovariance) \\
 \section{Proofs}\label{app:proofs}
 
 \textbf{Proof of Proposition~\ref{prop:kalman}.}
-\emph{(a)} Let $\hat x_t$ be the best linear predictor of $x_t$ given $(1,e_1,\dots,e_{t-1})$, and let $V_t$ be its MSE. Then $\hat x_1=\E[x_1]=0$ and $V_1=v$. The innovation $e_t-\hat x_t=(x_t-\hat x_t)+\varepsilon_t$ has variance $V_t+d_t$, because $\varepsilon_t$ is uncorrelated with $x_t$ and with the past. Projecting $x_t$ on the innovation gives $\hat x_{t\mid t}=\hat x_t+K_t(e_t-\hat x_t)$, with MSE $(1-K_t)V_t$. Since $\eta_t=x_{t+1}-\rho x_t$ is uncorrelated with $(e_1,\dots,e_t)$, we get $\hat x_{t+1}=\rho\hat x_{t\mid t}$ and $V_{t+1}=\rho^2(1-K_t)V_t+\Var\eta_t$. Finally, $\varepsilon_{T+1}$ is uncorrelated with $(e_1,\dots,e_T)$, so the best linear predictor of $e_{T+1}$ is $\hat x_{T+1}$. The best linear predictor is unique, so it coincides with \eqref{eq:premium}. See \citet[Proposition~12.2.2]{brockwell1991} for the general wide-sense Kalman recursions.
+\emph{(a)} Let $\hat\xi_t$ be the best linear predictor of $\xi_t$ given $(1,e_1,\dots,e_{t-1})$, and let $V_t$ be its MSE. Then $\hat\xi_1=\E[\xi_1]=0$ and $V_1=v$. The innovation $e_t-\hat\xi_t=(\xi_t-\hat\xi_t)+\varepsilon_t$ has variance $V_t+d_t$, because $\varepsilon_t$ is uncorrelated with $\xi_t$ and with the past. Projecting $\xi_t$ on the innovation gives $\hat\xi_{t\mid t}=\hat\xi_t+K_t(e_t-\hat\xi_t)$, with MSE $(1-K_t)V_t$. Since $\zeta_t=\xi_{t+1}-\rho \xi_t$ is uncorrelated with $(e_1,\dots,e_t)$, we get $\hat\xi_{t+1}=\rho\hat\xi_{t\mid t}$ and $V_{t+1}=\rho^2(1-K_t)V_t+\Var(\zeta_t)$. Finally, $\varepsilon_{T+1}$ is uncorrelated with $(e_1,\dots,e_T)$, so the best linear predictor of $e_{T+1}$ is $\hat\xi_{T+1}$. The best linear predictor is unique, so it coincides with \eqref{eq:premium}. See \citet[Proposition~12.2.2]{brockwell1991} for the general wide-sense Kalman recursions.
 
-\emph{(b)} Unrolling $\hat x_{t+1}=\rho(1-K_t)\hat x_t+\rho K_te_t$ from $\hat x_1=0$ gives the stated coefficients. Since $V_1=v>0$, $V_{t+1}\ge(1-\rho^2)v>0$ and $0<d_t<\infty$, we have $K_t\in(0,1)$, so $w_t>0$ when $\rho>0$.
+\emph{(b)} Unrolling $\hat\xi_{t+1}=\rho(1-K_t)\hat\xi_t+\rho K_te_t$ from $\hat\xi_1=0$ gives the stated coefficients. Since $V_1=v>0$, $V_{t+1}\ge(1-\rho^2)v>0$ and $0<d_t<\infty$, we have $K_t\in(0,1)$, so $w_t>0$ when $\rho>0$.
 
-\emph{(c)} Summing the coefficients of $\hat x_{t+1}$ gives $S_t=\rho(1-K_t)S_{t-1}+\rho K_t$. If $0\le S_{t-1}<1$, then $(1-K_t)S_{t-1}+K_t=1-(1-K_t)(1-S_{t-1})\in(0,1)$, hence $0<S_t<\rho$. Induction from $S_0=0$ completes the proof.
+\emph{(c)} Summing the coefficients of $\hat\xi_{t+1}$ gives $S_t=\rho(1-K_t)S_{t-1}+\rho K_t$. If $0\le S_{t-1}<1$, then $(1-K_t)S_{t-1}+K_t=1-(1-K_t)(1-S_{t-1})\in(0,1)$, hence $0<S_t<\rho$. Induction from $S_0=0$ completes the proof.
 
 \emph{(d)} Since $Z_t\ge0$, we have $e_t\ge-1$. By (b), $\sum_tw_te_t\ge-S_T$, with equality if and only if $Z_1=\dots=Z_T=0$. The bound follows from (c).
 

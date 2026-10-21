@@ -366,7 +366,6 @@ In practice, $G_\beta$ is computed by numerical differentiation of $\bar{\boldsy
 \item \emph{S1 lag-only} and \emph{S1 equal weights}: the robustness variants of Section~\ref{sec:estimation}.
 \item \emph{Oracle parameters}: Theorem~\ref{thm:main} with the true $(\bbeta,\gamma,a)$, i.e., the best linear premium.
 \item \emph{Best exchangeable}: the static premium of Corollary~\ref{cor:special}(ii) with the true $\bbeta$ and $a$ and the credibility constant chosen to minimize the population MSE under the true $\gamma(\cdot)$ (Appendix~\ref{app:mse}).
-\item \emph{Oracle $\theta$}: $\mu_{i,T+1}\theta_{i,T+1}$, the true conditional mean of next year's claim cost, computed from the true $\bbeta$ and the realized, unobservable latent factor rather than from past claims. Its premium error is zero by construction, so its out-of-sample MSE equals the irreducible Tweedie noise $\E[a\mu_{i,T+1}^p]$, a lower bound for every premium. It is infeasible in practice and serves only to show how much of the MSE no premium can remove.
 \end{itemize}
 Table~\ref{tab:competitors} summarizes what each competitor knows and how it combines past claims.
 
@@ -388,7 +387,6 @@ S1 equal weights & est. & est.\ (unweighted) & S1 & covariates, past claims & ye
 \midrule
 Oracle parameters & true & true & true $\gamma(\cdot)$ & covariates, past claims & no \\
 Best exchangeable & true & true $a$; $v_s$ optimized & S3 with optimal $v_s$ & covariates, past claims & no \\
-Oracle $\theta$ & true & not needed & --- & true $\theta_{i,T+1}$ & no \\
 \bottomrule
 \end{tabular*}
 \end{adjustwidth}
@@ -398,7 +396,7 @@ Oracle $\theta$ & true & not needed & --- & true $\theta_{i,T+1}$ & no \\
 \[
 \text{share}(M)=\frac{\mathrm{PE}_{\rm naive}-\mathrm{PE}_M}{\mathrm{PE}_{\rm naive}-\mathrm{PE}_{\rm oracle\ param}},\qquad \mathrm{PE}_M=\E[(\mu_{T+1}\theta_{T+1}-P^M_{T+1})^2],
 \]
-which uses the premium error to remove the irreducible Tweedie noise (Appendix~\ref{app:mse}); its standard error is computed by bootstrapping replications. We also report the fraction of replications in which a method beats the naive premium, and the mean Tweedie deviance. For estimation, we report medians and interquartile ranges (the sampling distributions are skewed), coverage of 95\% Wald intervals, rejection rates of the $J$ and Wald tests at the 5\% level, and the frequency of estimates near the boundary ($\hat\rho>0.99$ or $\hat v<10^{-3}$).
+which uses the premium error to remove the irreducible Tweedie noise (Appendix~\ref{app:mse}). The premium error is the squared distance to the true conditional mean $\mu_{i,T+1}\theta_{i,T+1}$, which is the infeasible ideal premium built from the true $\bbeta$ and the realized latent factor; even that premium has out-of-sample MSE $\E[a\mu_{i,T+1}^p]$, the part of the MSE that no premium can remove. The standard error of the share is computed by bootstrapping replications. We also report the fraction of replications in which a method beats the naive premium, and the mean Tweedie deviance. For estimation, we report medians and interquartile ranges (the sampling distributions are skewed), coverage of 95\% Wald intervals, rejection rates of the $J$ and Wald tests at the 5\% level, and the frequency of estimates near the boundary ($\hat\rho>0.99$ or $\hat v<10^{-3}$).
 
 \textbf{Unit test.} Under correct moments the oracle-parameter premium is the best linear predictor. Its exact population MSE \eqref{eq:exactmse} is therefore a lower bound for every linear premium in expectation, and it must match the simulated oracle-parameter MSE within Monte Carlo error. Table~\ref{tab:exact} confirms this for all cells. In expectation, the ordering is oracle parameters $\le$ best exchangeable $\le$ naive.
 

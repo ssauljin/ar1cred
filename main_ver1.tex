@@ -307,7 +307,7 @@ where $\widehat\Omega$ is the covariance matrix of the per-policy contributions 
 \begin{equation}\label{eq:md}
 \widehat\bpsi=\argmin_{\bpsi}\ \{\widehat\boeta-\boeta(\bpsi)\}^\top\widehat V^{-1}\{\widehat\boeta-\boeta(\bpsi)\},\qquad \widehat V=I^{-1}\bar A^{-1}\widehat\Omega\bar A^{-\top}.
 \end{equation}
-All structures are therefore fitted to the same $T+1$ summary statistics with their estimated covariance, which is fast and numerically stable. We reparametrize $v=e^{\nu}$, $\sigma_W^2=e^{\nu}$, $\rho=\operatorname{logit}^{-1}(\kappa)$, $\rho_W=\operatorname{logit}^{-1}(\kappa)$ and $a=e^{\alpha}$, so that estimates always lie in the parameter space. We also report a \emph{lag-only} variant of S1, which fits $(v,\rho)$ to the lag moments \eqref{eq:lagmom} and takes $\hat a$ from the NP diagonal block, and an \emph{equal-weight} variant with $w_{itk}=\omega_{it}=1$.
+All structures are therefore fitted to the same $T+1$ summary statistics with their estimated covariance, which is fast and numerically stable. We reparametrize $v=e^{\nu}$, $\sigma_W^2=e^{\nu}$, $\rho=\operatorname{logit}^{-1}(\kappa)$, $\rho_W=\operatorname{logit}^{-1}(\kappa)$ and $a=e^{\alpha}$, so that estimates always lie in the parameter space. We also report two robustness variants of S1, each of which removes one ingredient of the estimator. The \emph{lag-only} variant fits $(v,\rho)$ to the lag moments \eqref{eq:lagmom} alone and takes $\hat a$ from the NP diagonal block. The lag moments are free of the claim noise and do not depend on $p$, $\phi$ or the variance function, whereas the diagonal moment \eqref{eq:diagmom} mixes signal and noise, relies on the nugget being proportional to $\mu_{it}^{p-2}$ and is driven by the heavy-tailed $\hat e_{it}^2$. Comparing the two fits therefore shows how much the diagonal moment adds, and a large discrepancy flags a misspecified variance function or $p$. The \emph{equal-weight} variant sets $w_{itk}=\omega_{it}=1$. Because the moment conditions hold for any weights that depend only on covariates, the weights affect efficiency rather than consistency, and this variant measures how much precision they buy, which is expected to matter most when $\mu_{it}$ is very heterogeneous.
 
 \textbf{Plug-in premium.} The feasible premium inserts $\hat\mu_{i,T+1}$, $\hat e_{it}$, $\hat q_{it}$, $\gamma(k;\widehat\bpsi)$ and $\hat a$ into \eqref{eq:premium}, or into the recursion of Proposition~\ref{prop:kalman} for S1.
 
@@ -365,9 +365,34 @@ In practice, $G_\beta$ is computed by numerical differentiation of $\bar{\boldsy
 \item \emph{S2} and \emph{NP}: structure S2 and the nonparametric autocovariances, plugged into Theorem~\ref{thm:main}.
 \item \emph{S1 lag-only} and \emph{S1 equal weights}: the robustness variants of Section~\ref{sec:estimation}.
 \item \emph{Oracle parameters}: Theorem~\ref{thm:main} with the true $(\bbeta,\gamma,a)$, i.e., the best linear premium.
-\item \emph{Best exchangeable}: the best static premium with true moments (Appendix~\ref{app:mse}).
-\item \emph{Oracle $\theta$}: $\mu_{i,T+1}\theta_{i,T+1}$, which is not a linear premium.
+\item \emph{Best exchangeable}: the static premium of Corollary~\ref{cor:special}(ii) with the true $\bbeta$ and $a$ and the credibility constant chosen to minimize the population MSE under the true $\gamma(\cdot)$ (Appendix~\ref{app:mse}).
+\item \emph{Oracle $\theta$}: $\mu_{i,T+1}\theta_{i,T+1}$, the true conditional mean of next year's claim cost, computed from the true $\bbeta$ and the realized, unobservable latent factor rather than from past claims. Its premium error is zero by construction, so its out-of-sample MSE equals the irreducible Tweedie noise $\E[a\mu_{i,T+1}^p]$, a lower bound for every premium. It is infeasible in practice and serves only to show how much of the MSE no premium can remove.
 \end{itemize}
+Table~\ref{tab:competitors} summarizes what each competitor knows and how it combines past claims.
+
+\begin{table}[H]
+\caption{Competitors in the simulation study. ``Est.'' means estimated from the training years; ``true'' means set to its data-generating value. The structure column gives the latent autocovariance used to form the credibility weights. Feasible methods can be computed from observed data; the others are benchmarks.\label{tab:competitors}}
+\begin{adjustwidth}{-\extralength}{0cm}
+\small
+\begin{tabular*}{\fulllength}{@{\extracolsep{\fill}}lllllc@{}}
+\toprule
+Method & $\bbeta$ & $\gamma(\cdot)$ and $a$ & Structure for the weights & Information used & Feasible \\
+\midrule
+Naive & est. & --- & none (weights $=0$) & covariates only & yes \\
+Static (fitted) & est. & est.\ (GMM) & S3: $\gamma(k)=v$ & covariates, past claims & yes \\
+S1 (proposed) & est. & est.\ (GMM) & S1: $\gamma(k)=v\rho^k$ & covariates, past claims & yes \\
+S2 & est. & est.\ (GMM) & S2: $\gamma(k)=e^{\sigma_W^2\rho_W^k}-1$ & covariates, past claims & yes \\
+NP & est. & est.\ (moments) & nonparametric $\hat\gamma(k)$ & covariates, past claims & yes \\
+S1 lag-only & est. & est.\ (lags only) & S1 & covariates, past claims & yes \\
+S1 equal weights & est. & est.\ (unweighted) & S1 & covariates, past claims & yes \\
+\midrule
+Oracle parameters & true & true & true $\gamma(\cdot)$ & covariates, past claims & no \\
+Best exchangeable & true & true $a$; $v_s$ optimized & S3 with optimal $v_s$ & covariates, past claims & no \\
+Oracle $\theta$ & true & not needed & --- & true $\theta_{i,T+1}$ & no \\
+\bottomrule
+\end{tabular*}
+\end{adjustwidth}
+\end{table}
 
 \textbf{Metrics.} For prediction, we report the paired relative reduction of out-of-sample MSE versus the naive premium, averaged over replications with Monte Carlo standard errors. We also report the share of the oracle gain,
 \[
@@ -748,7 +773,7 @@ Let $P=\mu_{T+1}(1+\bw^\top\be_T)$, where $\bw$ is any weight vector that depend
 \begin{equation}\label{eq:exactmse}
 \E[(Z_{T+1}-P)^2\mid\bx]=\mu_{T+1}^2\big\{v+a\mu_{T+1}^{p-2}-2\bw^\top\bc_T+\bw^\top(\Gamma_T+D_T)\bw\big\}.
 \end{equation}
-Averaging \eqref{eq:exactmse} over the covariate distribution (here over $2\times10^6$ simulated policies) gives the exact population MSE of the naive premium ($\bw=\boldsymbol0$), of the oracle-parameter premium ($\bw=(\Gamma_T+D_T)^{-1}\bc_T$) and of every exchangeable premium. The \emph{best exchangeable} premium minimizes the population MSE over the static credibility constant, using the true $a$ and $\bmu$. Moreover, if $P$ is any function of the training data, then $\E[Z_{T+1}-\mu_{T+1}\theta_{T+1}\mid\boldsymbol\theta,\mathcal{F}_T]=0$ implies
+Averaging \eqref{eq:exactmse} over the covariate distribution (here over $2\times10^6$ simulated policies) gives the exact population MSE of the naive premium ($\bw=\boldsymbol0$), of the oracle-parameter premium ($\bw=(\Gamma_T+D_T)^{-1}\bc_T$) and of every exchangeable premium. The \emph{best exchangeable} premium uses the true $a$ and $\bmu$ and chooses the static constant $v_s$ in Corollary~\ref{cor:special}(ii) to minimize this population MSE under the true $\gamma(\cdot)$; $v_s$ generally differs from $v$ and acts as an average covariance across lags. Moreover, if $P$ is any function of the training data, then $\E[Z_{T+1}-\mu_{T+1}\theta_{T+1}\mid\boldsymbol\theta,\mathcal{F}_T]=0$ implies
 \[
 \E[(Z_{T+1}-P)^2]=\E[(\mu_{T+1}\theta_{T+1}-P)^2]+\E\big[a\mu_{T+1}^{p}\big].
 \]

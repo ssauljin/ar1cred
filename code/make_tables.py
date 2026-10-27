@@ -123,6 +123,12 @@ for v in V_GRID:
                                      nodep=float(np.mean(r['p_nodep'] < .05)),
                                      boundary=float(np.mean(r['S1_boundary'])))
 write('tab_infA', '\n'.join(rows) + '\n')
+# main_ver2 drops the J-test columns (J S1, J S2, J S3)
+rows2 = []
+for row in rows:
+    c = [x.strip() for x in row[:-2].split('&')]
+    rows2.append(' & '.join(c[:5] + c[8:]) + ' \\\\')
+write('tab_infA2', '\n'.join(rows2) + '\n')
 
 # ----------------------------------------------------------------------------
 # Table: Study B prediction
@@ -317,12 +323,15 @@ print('done')
 # Inline the tables into the manuscript between %BEGIN/%END markers
 # ----------------------------------------------------------------------------
 import re
-TEX = os.path.join(HERE, '..', 'main_ver1.tex')
-src = open(TEX).read()
-for fn in sorted(os.listdir(TAB)):
-    nm = fn[:-4]
-    body = open(os.path.join(TAB, fn)).read()
-    src = re.sub(r'%%BEGIN %s\n.*?%%END %s\n' % (nm, nm),
-                 lambda m: '%%BEGIN %s\n%s%%END %s\n' % (nm, body, nm), src, flags=re.S)
-open(TEX, 'w').write(src)
+for name in ('main_ver1.tex', 'main_ver2.tex'):
+    TEX = os.path.join(HERE, '..', name)
+    if not os.path.exists(TEX):
+        continue
+    src = open(TEX).read()
+    for fn in sorted(os.listdir(TAB)):
+        nm = fn[:-4]
+        body = open(os.path.join(TAB, fn)).read()
+        src = re.sub(r'%%BEGIN %s\n.*?%%END %s\n' % (nm, nm),
+                     lambda m: '%%BEGIN %s\n%s%%END %s\n' % (nm, body, nm), src, flags=re.S)
+    open(TEX, 'w').write(src)
 print('tables inlined')

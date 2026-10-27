@@ -7,7 +7,7 @@ Python 3 with `numpy`, `scipy` and `matplotlib`.
 | `tweedie_gmm.py` | DGP, Tweedie GLM (stage 1), weighted moments and nonparametric estimator with stage-1-corrected covariance, minimum-distance/GMM fits of S1 (θ-AR(1)), S2 (log-AR(1)) and S3 (exchangeable), J and Wald tests, Theorem 1 and Proposition 2 premiums, exact MSE |
 | `test_core.py` | Unit tests: Kalman recursion = Theorem 1, weight bounds, recency counterexample, simulated vs exact MSE |
 | `sim.py` | Study A/B grid, sensitivity and null designs, cluster bootstrap |
-| `make_tables.py` | Builds `../results/tables/*.tex`, `../figures/*.pdf`, `../results/summary.json` and inlines the tables into `../main_ver1.tex` |
+| `make_tables.py` | Builds `../results/tables/*.tex`, `../figures/*.pdf`, `../results/summary.json` and inlines the tables into `../main_ver1.tex` and `../main_ver2.tex` |
 
 Reproduce (about 40 minutes on 4 cores):
 

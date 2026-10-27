@@ -194,7 +194,7 @@ write('tab_sens', '\n'.join(rows) + '\n')
 
 # truth values for sensitivity cells (all share v=0.5, r1=0.7 except nulls)
 rows = []
-for nm, lab in [('null_static', 'Static truth ($\\gamma(k)=v$)'), ('null_indep', 'Independence ($\\gamma(k)=0$, $k\\ge1$)'),
+for nm, lab in [('null_static', 'Static truth ($\\gamma(\\ell)=v$)'), ('null_indep', 'Independence ($\\gamma(\\ell)=0$, $\\ell\\ge1$)'),
                 ('grid_v0.5_r0.7', 'Central design')]:
     r = load(nm)
     rows.append('%s & %s & %s & %s & %s & %s & %s & %s \\\\' % (

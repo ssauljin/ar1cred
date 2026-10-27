@@ -61,7 +61,7 @@ $^{2}$ \quad Department of Next Generation Smart Energy System Convergence, Gach
 
 %=================================================================
 \abstract{%
-Claim costs combine a mass at zero, a heavy right tail and serial dependence within policies. We develop evolutionary credibility for Tweedie claim costs in a GLM rating structure, where a multiplicative latent risk factor follows a second-order stationary process. For any latent autocovariance $\gamma(k)$, the best linear premium is the GLM premium times a closed-form credibility factor that depends only on $\gamma(\cdot)$ and a single nugget constant; the naive premium and the exact Tweedie credibility of Ohlsson and Johansson (2006) are special cases. For autoregressive latent risk, the premium has an updating-type Kalman recursion with positive weights; it is always positive, and the maximal bonus is bounded by the persistence parameter. Because every input is identified by second moments of standardized residuals, we propose a semi-parametric two-step GMM estimator that requires no distributional assumption on the latent process. The estimator comes with stage-1-corrected standard errors, a Hansen specification test and Wald tests of static versus evolutionary credibility. In simulations with estimated parameters, the feasible premium captures 80--97\% of the oracle gain whenever latent heterogeneity is non-negligible, and a fitted static premium is never materially worse than the naive premium. Interval estimates of the latent variance are less reliable when the latent signal is weak or the residuals are very heavy-tailed.}
+Claim costs combine a mass at zero, a heavy right tail and serial dependence within policies. We develop evolutionary credibility for Tweedie claim costs in a GLM rating structure, where a multiplicative latent risk factor follows a second-order stationary process. For any latent autocovariance $\gamma(\ell)$, the best linear premium is the GLM premium times a closed-form credibility factor that depends only on $\gamma(\cdot)$ and a single nugget constant; the naive premium and the exact Tweedie credibility of Ohlsson and Johansson (2006) are special cases. For autoregressive latent risk, the premium has an updating-type Kalman recursion with positive weights; it is always positive, and the maximal bonus is bounded by the persistence parameter. Because every input is identified by second moments of standardized residuals, we propose a semi-parametric two-step GMM estimator that requires no distributional assumption on the latent process. The estimator comes with stage-1-corrected standard errors, a Hansen specification test and Wald tests of static versus evolutionary credibility. In simulations with estimated parameters, the feasible premium captures 80--97\% of the oracle gain whenever latent heterogeneity is non-negligible, and a fitted static premium is never materially worse than the naive premium. Interval estimates of the latent variance are less reliable when the latent signal is weak or the residuals are very heavy-tailed.}
 
 \keyword{evolutionary credibility; Tweedie distribution; latent autoregressive process; Kalman filter; generalized method of moments; bonus--malus; experience rating}
 
@@ -77,7 +77,7 @@ Insurance claim costs have a large mass at zero, a heavy right tail and a varian
 
 Classical credibility treats the latent risk of a policyholder as constant over time, so past years are exchangeable and receive equal weight. In practice, driving habits, occupation, health and exposure change, so the latent risk evolves. Recent experience is then more informative than old experience. Evolutionary credibility models make this explicit by letting the latent risk follow a stationary process \citep{gerber1975,sundt1981,albrecht1985,buhlmann2005course}. In frequency models with autoregressive random effects, the resulting premiums discount the age of claims \citep{pinquet2001,bolance2003}.
 
-This paper develops evolutionary credibility for Tweedie claim costs inside a GLM rating structure. Conditional on a multiplicative latent factor $\theta_{it}$ with mean one, the claim cost $Z_{it}$ of policyholder $i$ in year $t$ is Tweedie with mean $\mu_{it}\theta_{it}$, where $\mu_{it}=\exp(\bx_{it}^\top\bbeta)$. The latent factor is only assumed to be second-order stationary with autocovariance $\gamma(k)$. The contributions are as follows.
+This paper develops evolutionary credibility for Tweedie claim costs inside a GLM rating structure. Conditional on a multiplicative latent factor $\theta_{it}$ with mean one, the claim cost $Z_{it}$ of policyholder $i$ in year $t$ is Tweedie with mean $\mu_{it}\theta_{it}$, where $\mu_{it}=\exp(\bx_{it}^\top\bbeta)$. The latent factor is only assumed to be second-order stationary with autocovariance $\gamma(\ell)$. The contributions are as follows.
 \begin{enumerate}
 \item \textbf{A closed-form premium for any stationary latent process (Theorem~\ref{thm:main}).} The best linear predictor of next year's claim cost is the GLM premium times a credibility factor computed from $\gamma(\cdot)$ and a single nugget constant $a=\phi\,\E[\theta^p]$. The within-policy noise enters through a heteroscedastic, covariate-dependent diagonal term $a\mu_{it}^{p-2}$. The independent, exchangeable (static), $\theta$-scale AR(1) and log-normal AR(1) cases are corollaries. The exchangeable case reproduces the Tweedie credibility estimator of \citet{ohlsson2006exact}.
 \item \textbf{Structural results for AR(1) dependence (Proposition~\ref{prop:kalman}).} The premium has an updating-type (Kalman) recursion that costs $O(T)$ operations per policy. All weights are positive and add up to less than the autoregressive parameter $\rho$. The premium is therefore always positive, and the maximal bonus is bounded by $\rho$. We also give conditions under which recent years receive more weight than older ones, and show that this ordering can fail when the GLM mean changes over time.
@@ -114,14 +114,14 @@ Policyholders $i=1,\dots,I$ are observed in years $t=1,\dots,T_i$, and the targe
 $\mu_{it}=\exp(\bx_{it}^\top\bbeta)$, $\bmu_i$ & GLM mean and its vector $(\mu_{i1},\dots,\mu_{iT})^\top$ \\
 $\theta_{it}$ & latent multiplicative risk factor, $\E[\theta_{it}]=1$ \\
 $v=\Var(\theta_{it})$ & latent variance ($\theta$ scale) \\
-$\gamma(k)$, $r(k)=\gamma(k)/v$ & latent autocovariance $\Cov(\theta_{it},\theta_{i,t+k})$ and autocorrelation; $\gamma(0)=v$ \\
+$\gamma(\ell)$, $r(\ell)=\gamma(\ell)/v$ & latent autocovariance $\Cov(\theta_{it},\theta_{i,t+\ell})$ and autocorrelation; $\gamma(0)=v$ \\
 $a=\phi\,\E[\theta_{it}^p]$ & nugget (within-variance) constant \\
 $q_{it}=\mu_{it}^{p-2}$ & nugget scale: $\Var(e_{it}\mid\boldsymbol\theta_i)$ has mean $a q_{it}$ \\
 $e_{it}=Z_{it}/\mu_{it}-1$, $\be_i$ & standardized residual and its vector \\
 $\Gamma_T=[\gamma(|t-s|)]_{t,s=1}^T$ & latent covariance matrix of years $1,\dots,T$ \\
 $\bc_T=(\gamma(T),\dots,\gamma(1))^\top$ & latent cross-covariance with year $T+1$ \\
 $D_{i}=\diag(a q_{i1},\dots,a q_{iT})$ & nugget matrix \\
-$\rho$ & $\theta$-scale AR(1) parameter: $\gamma(k)=v\rho^k$ \\
+$\rho$ & $\theta$-scale AR(1) parameter: $\gamma(\ell)=v\rho^\ell$ \\
 $W_{it}=\log\theta_{it}$, $\sigma_W^2$, $\rho_W$ & log-scale variance and AR(1) parameter (log-normal AR(1) example) \\
 \bottomrule
 \end{tabularx}
@@ -157,14 +157,14 @@ Intuitively, the decomposition $e_{it}=\xi_{it}+\varepsilon_{it}$ separates the 
 
 Any positive-semidefinite autocovariance $\gamma(\cdot)$ is allowed. The following cases are used below.
 \begin{itemize}
-\item \emph{Independence:} $\gamma(k)=0$ for $k\ge1$.
-\item \emph{Exchangeable (static):} $\theta_{it}=\theta_i$, so $\gamma(k)=v$ for all $k$.
-\item \emph{$\theta$-scale AR(1):} $\gamma(k)=v\rho^k$, $0\le\rho<1$. Any positive process with $\E[\theta_{t+1}\mid\theta_t,\theta_{t-1},\ldots]=1-\rho+\rho\theta_t$ has this autocovariance, for example the gamma autoregressive sequences of \citet{gaver1980}.
+\item \emph{Independence:} $\gamma(\ell)=0$ for $\ell\ge1$.
+\item \emph{Exchangeable (static):} $\theta_{it}=\theta_i$, so $\gamma(\ell)=v$ for all $\ell$.
+\item \emph{$\theta$-scale AR(1):} $\gamma(\ell)=v\rho^\ell$, $0\le\rho<1$. Any positive process with $\E[\theta_{t+1}\mid\theta_t,\theta_{t-1},\ldots]=1-\rho+\rho\theta_t$ has this autocovariance, for example the gamma autoregressive sequences of \citet{gaver1980}.
 \item \emph{Log-normal AR(1):} $W_{it}=\log\theta_{it}$ is a stationary Gaussian AR(1) with variance $\sigma_W^2$, autocorrelation $\rho_W$ and mean $-\sigma_W^2/2$. Then
 \begin{equation}\label{eq:logar1}
-v=e^{\sigma_W^2}-1,\qquad \gamma(k)=\exp(\sigma_W^2\rho_W^k)-1,\qquad \E[\theta^p]=\exp\{\sigma_W^2p(p-1)/2\}.
+v=e^{\sigma_W^2}-1,\qquad \gamma(\ell)=\exp(\sigma_W^2\rho_W^\ell)-1,\qquad \E[\theta^p]=\exp\{\sigma_W^2p(p-1)/2\}.
 \end{equation}
-The $\theta$-scale autocorrelation $r(k)=\{\exp(\sigma_W^2\rho_W^k)-1\}/\{\exp(\sigma_W^2)-1\}$ is \emph{not} geometric. By convexity, $r(k)\le\rho_W^k$. For given $(v,r(1))$, the log-scale parameters are $\sigma_W^2=\log(1+v)$ and $\rho_W=\log\{1+v\,r(1)\}/\sigma_W^2$.
+The $\theta$-scale autocorrelation $r(\ell)=\{\exp(\sigma_W^2\rho_W^\ell)-1\}/\{\exp(\sigma_W^2)-1\}$ is \emph{not} geometric. By convexity, $r(\ell)\le\rho_W^\ell$. For given $(v,r(1))$, the log-scale parameters are $\sigma_W^2=\log(1+v)$ and $\rho_W=\log\{1+v\,r(1)\}/\sigma_W^2$.
 \item \emph{Other structures:} ARMA, long-memory (ARFIMA) and regime-switching processes for $\log\theta_{it}$ or for $\theta_{it}$. Each implies its own $\gamma(\cdot)$, and Theorem~\ref{thm:main} applies unchanged.
 \end{itemize}
 
@@ -201,14 +201,14 @@ The premium is a multiplicative experience correction to the GLM premium. The we
 
 \begin{Corollary}[Special cases]\label{cor:special}
 \begin{enumerate}
-\item[(i)] \textup{Independence.} If $\gamma(k)=0$ for $k\ge1$, then $P_{T+1}=\mu_{T+1}$, the naive (GLM) premium.
-\item[(ii)] \textup{Exchangeable.} If $\gamma(k)=v$ for all $k\ge0$, then, with $\kappa=a/v$,
+\item[(i)] \textup{Independence.} If $\gamma(\ell)=0$ for $\ell\ge1$, then $P_{T+1}=\mu_{T+1}$, the naive (GLM) premium.
+\item[(ii)] \textup{Exchangeable.} If $\gamma(\ell)=v$ for all $\ell\ge0$, then, with $\kappa=a/v$,
 \begin{equation}\label{eq:static}
 P_{T+1}=\mu_{T+1}\,\frac{\kappa+\sum_{t=1}^TZ_t\,\mu_t^{1-p}}{\kappa+\sum_{t=1}^T\mu_t^{2-p}}.
 \end{equation}
 This is the Tweedie credibility estimator of \citet{ohlsson2006exact}: a B\"uhlmann--Straub-type estimator with natural weights $\mu_t^{2-p}$ and credibility constant $\kappa$.
-\item[(iii)] \textup{$\theta$-scale AR(1).} If $\gamma(k)=v\rho^k$, then $\bw=(R_T+v^{-1}D_T)^{-1}(\rho^T,\dots,\rho)^\top$ with $[R_T]_{ts}=\rho^{|t-s|}$.
-\item[(iv)] \textup{Log-normal AR(1).} If $\log\theta_t$ is a Gaussian AR(1), \eqref{eq:premium} holds with $\gamma(k)$ and $a$ given by \eqref{eq:logar1}.
+\item[(iii)] \textup{$\theta$-scale AR(1).} If $\gamma(\ell)=v\rho^\ell$, then $\bw=(R_T+v^{-1}D_T)^{-1}(\rho^T,\dots,\rho)^\top$ with $[R_T]_{ts}=\rho^{|t-s|}$.
+\item[(iv)] \textup{Log-normal AR(1).} If $\log\theta_t$ is a Gaussian AR(1), \eqref{eq:premium} holds with $\gamma(\ell)$ and $a$ given by \eqref{eq:logar1}.
 \end{enumerate}
 \end{Corollary}
 
@@ -222,14 +222,14 @@ The premium depends on the latent law only through $\gamma(\cdot)$ and the fract
 
 \subsection{AR(1) Dependence: Recursion, Positivity and Bounds}
 
-For the $\theta$-scale AR(1) structure $\gamma(k)=v\rho^k$, write $\xi_t=\theta_t-1$ and $d_t=a\mu_t^{p-2}$. Then $\zeta_t=\xi_{t+1}-\rho \xi_t$ is uncorrelated with $\xi_s$ for $s\le t$ and with every $\varepsilon_s$, and $\Var(\zeta_t)=v(1-\rho^2)$. Hence
+For the $\theta$-scale AR(1) structure $\gamma(\ell)=v\rho^\ell$, write $\xi_t=\theta_t-1$ and $d_t=a\mu_t^{p-2}$. Then $\zeta_t=\xi_{t+1}-\rho \xi_t$ is uncorrelated with $\xi_s$ for $s\le t$ and with every $\varepsilon_s$, and $\Var(\zeta_t)=v(1-\rho^2)$. Hence
 \[
 \xi_{t+1}=\rho \xi_t+\zeta_t,\qquad e_t=\xi_t+\varepsilon_t,\qquad \Var(\varepsilon_t)=d_t,
 \]
 is a linear state-space model in the second-order sense. The Kalman recursions therefore compute linear projections exactly, without any Gaussian assumption \citep[Chapter~12]{brockwell1991}; see also \citet{harvey1989}.
 
 \begin{Proposition}\label{prop:kalman}
-Let $\gamma(k)=v\rho^k$ with $0<\rho<1$, and let $d_t=a\mu_t^{p-2}>0$.
+Let $\gamma(\ell)=v\rho^\ell$ with $0<\rho<1$, and let $d_t=a\mu_t^{p-2}>0$.
 \begin{enumerate}
 \item[(a)] \textup{Updating-type recursion.} Set $\hat\xi_1=0$, $V_1=v$ and, for $t=1,\dots,T$,
 \[
@@ -260,7 +260,7 @@ For a general $\gamma(\cdot)$, the Durbin--Levinson or innovations algorithm pro
 
 By Lemma~\ref{lem:moments}, the standardized residuals satisfy
 \begin{align}
-\E[e_{it}e_{i,t+k}\mid\bx_i]&=\gamma(k), && k=1,\dots,T-1, \label{eq:lagmom}\\
+\E[e_{it}e_{i,t+\ell}\mid\bx_i]&=\gamma(\ell), && \ell=1,\dots,T-1, \label{eq:lagmom}\\
 \E[e_{it}^2\mid\bx_i]&=\gamma(0)+a\,q_{it}, && q_{it}=\mu_{it}^{p-2}. \label{eq:diagmom}
 \end{align}
 The lag moments \eqref{eq:lagmom} do not depend on $\phi$, $p$ or the law of $\theta$. The premium \eqref{eq:premium} depends on the data-generating process only through $(\bbeta,p)$, $\gamma(0),\dots,\gamma(T)$ and $a$. Hence:
@@ -280,23 +280,23 @@ The lag moments \eqref{eq:lagmom} do not depend on $\phi$, $p$ or the law of $\t
 \]
 The per-policy moment contributions are
 \begin{align}
-g_{ik}(\boeta)&=\sum_{t=1}^{T-k}w_{itk}\{\hat e_{it}\hat e_{i,t+k}-\gamma(k)\}, && k=1,\dots,T-1,\label{eq:g}\\
+g_{i\ell}(\boeta)&=\sum_{t=1}^{T-\ell}w_{it\ell}\{\hat e_{it}\hat e_{i,t+\ell}-\gamma(\ell)\}, && \ell=1,\dots,T-1,\label{eq:g}\\
 h_{ij}(\boeta)&=\sum_{t=1}^{T}\omega_{it}\,z_{itj}\{\hat e_{it}^2-\gamma(0)-a\hat q_{it}\}, && \boldsymbol z_{it}=(1,\hat q_{it})^\top,\label{eq:h}
 \end{align}
 with precision weights
 \[
-w_{itk}=(\hat s_{it}^2\,\hat s_{i,t+k}^2)^{-1},\qquad \omega_{it}=\hat s_{it}^{-4},\qquad \hat s_{it}^2=\hat a\,\hat q_{it}+\hat v .
+w_{it\ell}=(\hat s_{it}^2\,\hat s_{i,t+\ell}^2)^{-1},\qquad \omega_{it}=\hat s_{it}^{-4},\qquad \hat s_{it}^2=\hat a\,\hat q_{it}+\hat v .
 \]
 Here $\hat s_{it}^2$ estimates $\Var(e_{it})$. The weights are computed from preliminary estimates and updated two or three times, starting from equal weights. They down-weight policy-years with small $\mu_{it}$, whose residuals consist mostly of Tweedie noise. This matters when $\mu$ is very heterogeneous. Since the weights depend only on covariates and preliminary estimates, they do not affect consistency.
 
-Let $\boldsymbol m_i(\boeta)=(h_{i1},h_{i2},g_{i1},\dots,g_{i,T-1})^\top$ and $\bar{\boldsymbol m}(\boeta)=I^{-1}\sum_i\boldsymbol m_i(\boeta)$. The moments are \emph{linear} in $\boeta$, so $\bar{\boldsymbol m}(\boeta)=\bar{\boldsymbol b}-\bar A\boeta$ for a block-diagonal matrix $\bar A$ and a vector $\bar{\boldsymbol b}$ of weighted sums. The \emph{nonparametric} (NP) estimator solves $\bar{\boldsymbol m}(\widehat\boeta)=\boldsymbol0$ in closed form: each $\hat\gamma(k)$ is a weighted average of lag-$k$ cross-products, and $(\hat\gamma(0),\hat a)$ is a weighted regression of $\hat e_{it}^2$ on $(1,\hat q_{it})$.
+Let $\boldsymbol m_i(\boeta)=(h_{i1},h_{i2},g_{i1},\dots,g_{i,T-1})^\top$ and $\bar{\boldsymbol m}(\boeta)=I^{-1}\sum_i\boldsymbol m_i(\boeta)$. The moments are \emph{linear} in $\boeta$, so $\bar{\boldsymbol m}(\boeta)=\bar{\boldsymbol b}-\bar A\boeta$ for a block-diagonal matrix $\bar A$ and a vector $\bar{\boldsymbol b}$ of weighted sums. The \emph{nonparametric} (NP) estimator solves $\bar{\boldsymbol m}(\widehat\boeta)=\boldsymbol0$ in closed form: each $\hat\gamma(\ell)$ is a weighted average of lag-$\ell$ cross-products, and $(\hat\gamma(0),\hat a)$ is a weighted regression of $\hat e_{it}^2$ on $(1,\hat q_{it})$.
 
-\textbf{Parametric latent structures.} A structure $\boeta=\boeta(\bpsi)$ specifies $\gamma(k;\bpsi)$ and $a$. We use
+\textbf{Parametric latent structures.} A structure $\boeta=\boeta(\bpsi)$ specifies $\gamma(\ell;\bpsi)$ and $a$. We use
 \begin{itemize}
-\item S0 (independence, naive): $\gamma(k)=0$ for $k\ge1$;
-\item S1 ($\theta$-scale AR(1)): $\bpsi=(v,\rho,a)$, $\gamma(k)=v\rho^k$; Proposition~\ref{prop:kalman} applies;
-\item S2 (log-normal AR(1)): $\bpsi=(\sigma_W^2,\rho_W,a)$, $\gamma(k)=\exp(\sigma_W^2\rho_W^k)-1$;
-\item S3 (exchangeable): $\bpsi=(v,a)$, $\gamma(k)=v$, which gives a \emph{fitted} static benchmark through Corollary~\ref{cor:special}(ii);
+\item S0 (independence, naive): $\gamma(\ell)=0$ for $\ell\ge1$;
+\item S1 ($\theta$-scale AR(1)): $\bpsi=(v,\rho,a)$, $\gamma(\ell)=v\rho^\ell$; Proposition~\ref{prop:kalman} applies;
+\item S2 (log-normal AR(1)): $\bpsi=(\sigma_W^2,\rho_W,a)$, $\gamma(\ell)=\exp(\sigma_W^2\rho_W^\ell)-1$;
+\item S3 (exchangeable): $\bpsi=(v,a)$, $\gamma(\ell)=v$, which gives a \emph{fitted} static benchmark through Corollary~\ref{cor:special}(ii);
 \item NP: $\widehat\boeta$ itself, with the tail $\hat\gamma(T)=\hat\gamma(T-1)\min\{\hat\gamma(T-1)/\hat\gamma(T-2),1\}$ when both are positive, and $0$ otherwise.
 \end{itemize}
 The efficient two-step GMM estimator is
@@ -307,9 +307,9 @@ where $\widehat\Omega$ is the covariance matrix of the per-policy contributions 
 \begin{equation}\label{eq:md}
 \widehat\bpsi=\argmin_{\bpsi}\ \{\widehat\boeta-\boeta(\bpsi)\}^\top\widehat V^{-1}\{\widehat\boeta-\boeta(\bpsi)\},\qquad \widehat V=I^{-1}\bar A^{-1}\widehat\Omega\bar A^{-\top}.
 \end{equation}
-All structures are therefore fitted to the same $T+1$ summary statistics with their estimated covariance, which is fast and numerically stable. We reparametrize $v=e^{\nu}$, $\sigma_W^2=e^{\nu}$, $\rho=\operatorname{logit}^{-1}(\kappa)$, $\rho_W=\operatorname{logit}^{-1}(\kappa)$ and $a=e^{\alpha}$, so that estimates always lie in the parameter space. We also report two robustness variants of S1, each of which removes one ingredient of the estimator. The \emph{lag-only} variant fits $(v,\rho)$ to the lag moments \eqref{eq:lagmom} alone and takes $\hat a$ from the NP diagonal block. The lag moments are free of the claim noise and do not depend on $p$, $\phi$ or the variance function, whereas the diagonal moment \eqref{eq:diagmom} mixes signal and noise, relies on the nugget being proportional to $\mu_{it}^{p-2}$ and is driven by the heavy-tailed $\hat e_{it}^2$. Comparing the two fits therefore shows how much the diagonal moment adds, and a large discrepancy flags a misspecified variance function or $p$. The \emph{equal-weight} variant sets $w_{itk}=\omega_{it}=1$. Because the moment conditions hold for any weights that depend only on covariates, the weights affect efficiency rather than consistency, and this variant measures how much precision they buy, which is expected to matter most when $\mu_{it}$ is very heterogeneous.
+All structures are therefore fitted to the same $T+1$ summary statistics with their estimated covariance, which is fast and numerically stable. We reparametrize $v=e^{\nu}$, $\sigma_W^2=e^{\nu}$, $\rho=\operatorname{logit}^{-1}(\tau)$, $\rho_W=\operatorname{logit}^{-1}(\tau)$ and $a=e^{\alpha}$, so that estimates always lie in the parameter space. We also report two robustness variants of S1, each of which removes one ingredient of the estimator. The \emph{lag-only} variant fits $(v,\rho)$ to the lag moments \eqref{eq:lagmom} alone and takes $\hat a$ from the NP diagonal block. The lag moments are free of the claim noise and do not depend on $p$, $\phi$ or the variance function, whereas the diagonal moment \eqref{eq:diagmom} mixes signal and noise, relies on the nugget being proportional to $\mu_{it}^{p-2}$ and is driven by the heavy-tailed $\hat e_{it}^2$. Comparing the two fits therefore shows how much the diagonal moment adds, and a large discrepancy flags a misspecified variance function or $p$. The \emph{equal-weight} variant sets $w_{it\ell}=\omega_{it}=1$. Because the moment conditions hold for any weights that depend only on covariates, the weights affect efficiency rather than consistency, and this variant measures how much precision they buy, which is expected to matter most when $\mu_{it}$ is very heterogeneous.
 
-\textbf{Plug-in premium.} The feasible premium inserts $\hat\mu_{i,T+1}$, $\hat e_{it}$, $\hat q_{it}$, $\gamma(k;\widehat\bpsi)$ and $\hat a$ into \eqref{eq:premium}, or into the recursion of Proposition~\ref{prop:kalman} for S1.
+\textbf{Plug-in premium.} The feasible premium inserts $\hat\mu_{i,T+1}$, $\hat e_{it}$, $\hat q_{it}$, $\gamma(\ell;\widehat\bpsi)$ and $\hat a$ into \eqref{eq:premium}, or into the recursion of Proposition~\ref{prop:kalman} for S1.
 
 \subsection{Asymptotic Theory}
 
@@ -378,10 +378,10 @@ Table~\ref{tab:competitors} summarizes what each competitor knows and how it com
 Method & $\bbeta$ & $\gamma(\cdot)$ and $a$ & Structure for the weights & Information used & Feasible \\
 \midrule
 Naive & est. & --- & none (weights $=0$) & covariates only & yes \\
-Static (fitted) & est. & est.\ (GMM) & S3: $\gamma(k)=v$ & covariates, past claims & yes \\
-S1 (proposed) & est. & est.\ (GMM) & S1: $\gamma(k)=v\rho^k$ & covariates, past claims & yes \\
-S2 & est. & est.\ (GMM) & S2: $\gamma(k)=e^{\sigma_W^2\rho_W^k}-1$ & covariates, past claims & yes \\
-NP & est. & est.\ (moments) & nonparametric $\hat\gamma(k)$ & covariates, past claims & yes \\
+Static (fitted) & est. & est.\ (GMM) & S3: $\gamma(\ell)=v$ & covariates, past claims & yes \\
+S1 (proposed) & est. & est.\ (GMM) & S1: $\gamma(\ell)=v\rho^\ell$ & covariates, past claims & yes \\
+S2 & est. & est.\ (GMM) & S2: $\gamma(\ell)=e^{\sigma_W^2\rho_W^\ell}-1$ & covariates, past claims & yes \\
+NP & est. & est.\ (moments) & nonparametric $\hat\gamma(\ell)$ & covariates, past claims & yes \\
 S1 lag-only & est. & est.\ (lags only) & S1 & covariates, past claims & yes \\
 S1 equal weights & est. & est.\ (unweighted) & S1 & covariates, past claims & yes \\
 \midrule
@@ -439,7 +439,7 @@ $v$ & $r(1)$ & Zero (\%) & Naive MSE & OP gain (\%) & BE gain (\%) & OP MSE (exa
 
 Tables~\ref{tab:estA} and~\ref{tab:infA} and Figure~\ref{fig:box} summarize the estimator. Five findings stand out.
 
-\textbf{Point estimates (Table~\ref{tab:estA}, Figure~\ref{fig:box}).} Both parametric fits recover the latent variance and the lag-1 correlation well whenever there is a non-negligible latent signal. In the central cell ($v=0.5$, $r(1)=0.7$), the medians are $\hat v=0.50$ (S1) and $0.51$ (S2), and $\hat r(1)=0.68$ and $0.67$. The S1 working model is misspecified for $k\ge2$, yet its $\hat v$ and $\hat\rho$ are almost indistinguishable from the S2 estimates of $v$ and $r(1)$. At $v=2$, the median S1 estimate of $v$ is 3--13\% below the truth (S2: between $-14\%$ and $+9\%$), a consequence of the very heavy tails of $e_{it}^2$ ($\E[\theta^4]\approx735$). At $v=0.1$, the signal is weak relative to the nugget ($v/(aq)\approx0.03$ for a typical policy). Here $\hat v$ is biased upward, and $\hat r(1)$ is shrunk toward zero when $r(1)$ is small.
+\textbf{Point estimates (Table~\ref{tab:estA}, Figure~\ref{fig:box}).} Both parametric fits recover the latent variance and the lag-1 correlation well whenever there is a non-negligible latent signal. In the central cell ($v=0.5$, $r(1)=0.7$), the medians are $\hat v=0.50$ (S1) and $0.51$ (S2), and $\hat r(1)=0.68$ and $0.67$. The S1 working model is misspecified for $\ell\ge2$, yet its $\hat v$ and $\hat\rho$ are almost indistinguishable from the S2 estimates of $v$ and $r(1)$. At $v=2$, the median S1 estimate of $v$ is 3--13\% below the truth (S2: between $-14\%$ and $+9\%$), a consequence of the very heavy tails of $e_{it}^2$ ($\E[\theta^4]\approx735$). At $v=0.1$, the signal is weak relative to the nugget ($v/(aq)\approx0.03$ for a typical policy). Here $\hat v$ is biased upward, and $\hat r(1)$ is shrunk toward zero when $r(1)$ is small.
 
 \textbf{Coverage (Tables~\ref{tab:boot} and~\ref{tab:infA}).} With $0.25\le v\le1$ and $r(1)\ge0.5$, Wald intervals for $v$ and $r(1)$ under S2 cover the truth in 80--97\% of replications. Coverage drops to 72--88\% in the weak-signal cells ($v=0.1$) and, for $v$, in the heavy-tailed cells ($v=2$). Intervals for the nonparametric $\gamma(1)$, a linear moment, are closer to nominal: 89--95\% for $v\le1$ and 78--90\% at $v=2$. Table~\ref{tab:boot} reports a cluster bootstrap of the whole two-stage procedure. In the weak-signal cell it restores near-nominal coverage (94.5\% for $v$ and 92\% for $r(1)$, against 72\% and 78.5\% for Wald intervals), and bias correction removes the upward bias of $\hat v$ (median 0.10 against 0.15). In the heavy-tailed cell ($v=2$, $r(1)=0.9$) it does not help for $v$: coverage stays near 75\%, and the median $\hat v$ remains 18--20\% below the truth, with or without bias correction, in these 200 replications. There, the sampling distribution of $\hat v$ is driven by rare extreme residuals that a resample of 2000 policies does not reproduce. Intervals for $r(1)$ are reliable in all three cells.
 
@@ -549,7 +549,7 @@ Table~\ref{tab:predB} and Figures~\ref{fig:heatmap}--\ref{fig:gain} report predi
 
 \textbf{Static benchmark (Table~\ref{tab:predB}).} The fitted static premium is never materially worse than the naive premium; its largest loss is 0.03\% of MSE. This contradicts the view that pooling past claims can be harmful under serial dependence: that conclusion arises only when the full $\Var\theta$ is plugged into an exchangeable formula, whereas a fitted exchangeable model estimates the average covariance. The static premium captures substantially less of the gain than S1 at low and moderate persistence (e.g., 37\% versus 84\% at $v=0.5$, $r(1)=0.5$). At $r(1)=0.9$, the two are close, because a five-year window of a highly persistent process is nearly exchangeable. Even then, S1 has the smaller premium error in 58--76\% of the replications with $v\ge0.25$.
 
-\textbf{Variants (Table~\ref{tab:variants}).} Table~\ref{tab:variants} compares estimator variants. Joint GMM (S1) gains most over the lag-only variant where the lag moments are weak: by 16--28 percentage points of the oracle gain at $r(1)=0.3$ (for $v\ge0.25$) and by up to 14 points at $r(1)=0.5$. There, the diagonal moments carry real information about $v$. At $r(1)\ge0.7$ the differences are small ($-1$ to $8$ points). In the baseline design, equal weights lose 0--8 points, because the residuals are already standardized and $\mu$ is moderately heterogeneous. In the more heterogeneous design, the precision weights matter more (Section~\ref{sec:sensitivity}). The nonparametric plug-in premium is unreliable. Its noisy $\hat\gamma(k)$ and extrapolated $\hat\gamma(T)$ occasionally produce extreme or negative premiums (up to 567 nonpositive premiums out of $10^6$ in a cell), which destroys its mean deviance. The NP estimates are therefore best used for testing, not pricing. Neither S1 (by Proposition~\ref{prop:kalman}) nor S2 (empirically) produced a single nonpositive premium. On the deviance scale, S1 improves on the naive premium in every cell with $v\ge0.25$.
+\textbf{Variants (Table~\ref{tab:variants}).} Table~\ref{tab:variants} compares estimator variants. Joint GMM (S1) gains most over the lag-only variant where the lag moments are weak: by 16--28 percentage points of the oracle gain at $r(1)=0.3$ (for $v\ge0.25$) and by up to 14 points at $r(1)=0.5$. There, the diagonal moments carry real information about $v$. At $r(1)\ge0.7$ the differences are small ($-1$ to $8$ points). In the baseline design, equal weights lose 0--8 points, because the residuals are already standardized and $\mu$ is moderately heterogeneous. In the more heterogeneous design, the precision weights matter more (Section~\ref{sec:sensitivity}). The nonparametric plug-in premium is unreliable. Its noisy $\hat\gamma(\ell)$ and extrapolated $\hat\gamma(T)$ occasionally produce extreme or negative premiums (up to 567 nonpositive premiums out of $10^6$ in a cell), which destroys its mean deviance. The NP estimates are therefore best used for testing, not pricing. Neither S1 (by Proposition~\ref{prop:kalman}) nor S2 (empirically) produced a single nonpositive premium. On the deviance scale, S1 improves on the naive premium in every cell with $v\ge0.25$.
 
 \begin{table}[H]
 \caption{Study B: relative reduction (\%) of out-of-sample MSE versus the naive premium (paired, mean over 500 replications, with Monte Carlo SE in parentheses), share (\%) of the oracle gain captured on the premium-error scale, and the share (\%) of replications in which S1 has a smaller premium error than naive. OP: oracle parameters.\label{tab:predB}}
@@ -683,8 +683,8 @@ Heterogeneous $\mu$ ($\beta_1=1.5$) & 0.48 & 0.69 & 6.8 & 58 & 98 & 98 & 3.52 (0
 Truth & Static Wald & No-dep.\ Wald & $J$ S1 & $J$ S2 & $J$ S3 & Static share & S1 share \\
 \midrule
 %BEGIN tab_null
-Static truth ($\gamma(k)=v$) & 6.4 & 100.0 & 8.0 & 10.8 & 6.2 & 99 & 97 \\
-Independence ($\gamma(k)=0$, $k\ge1$) & 7.0 & 8.8 & 11.8 & 11.8 & 19.6 & --- & --- \\
+Static truth ($\gamma(\ell)=v$) & 6.4 & 100.0 & 8.0 & 10.8 & 6.2 & 99 & 97 \\
+Independence ($\gamma(\ell)=0$, $\ell\ge1$) & 7.0 & 8.8 & 11.8 & 11.8 & 19.6 & --- & --- \\
 Central design & 50.6 & 99.8 & 5.2 & 5.8 & 48.2 & 71 & 92 \\
 %END tab_null
 \bottomrule
